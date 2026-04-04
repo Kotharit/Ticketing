@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="TenantDesk — Tenant maintenance ticketing portal" />
+  <title>TenantDesk</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    body { background: #f0f2f5; min-height: 100vh; display: flex; justify-content: center; padding: 20px; }
+    .app { width: 100%; max-width: 480px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 16px rgba(0,0,0,0.08); min-height: 600px; display: flex; flex-direction: column; }
+    .nav { background: #185FA5; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+    .nav-title { color: #E6F1FB; font-size: 16px; font-weight: 600; }
+    .nav-sub { color: #85B7EB; font-size: 11px; margin-top: 2px; }
+    .nav-right { display: flex; align-items: center; gap: 8px; }
+    .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: #378ADD; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; }
+    .nav-admin-btn { background: rgba(255,255,255,0.15); border: none; color: #E6F1FB; font-size: 11px; padding: 5px 10px; border-radius: 6px; cursor: pointer; }
+    .nav-admin-btn:hover { background: rgba(255,255,255,0.25); }
+    .body { padding: 22px 18px; flex: 1; overflow-y: auto; max-height: 90vh; }
+    .page { display: none; } .page.active { display: block; }
+    h2 { font-size: 20px; font-weight: 600; color: #111; margin-bottom: 4px; }
+    .sub { font-size: 13px; color: #888; margin-bottom: 20px; }
+    .auto-badge { display: inline-block; font-size: 9px; padding: 2px 7px; border-radius: 4px; background: #EAF3DE; color: #3B6D11; margin-left: 6px; }
+    .edited-badge { display: inline-block; font-size: 9px; padding: 2px 7px; border-radius: 4px; background: #FAEEDA; color: #633806; margin-left: 6px; }
+    .info-card { background: #f8f8f8; border-radius: 10px; padding: 14px; margin-bottom: 18px; border: 1px solid #eee; }
+    .info-card-label { font-size: 10px; color: #aaa; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .info-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f0f0f0; align-items: center; gap: 8px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-key { color: #999; flex-shrink: 0; } .info-val { font-weight: 500; color: #222; text-align: right; }
+    .edit-inline { background: #fff; border: 1px solid #185FA5; border-radius: 6px; padding: 5px 8px; font-size: 12px; color: #222; width: 180px; }
+    .edit-link { font-size: 11px; color: #185FA5; cursor: pointer; background: none; border: none; padding: 0; }
+    .edit-actions { display: none; gap: 8px; margin-top: 12px; }
+    .btn-primary { background: #185FA5; color: #fff; border: none; border-radius: 10px; padding: 13px; font-size: 14px; font-weight: 600; width: 100%; cursor: pointer; margin-bottom: 10px; }
+    .btn-primary:hover { background: #0C447C; }
+    .btn-ghost { background: #f5f5f5; color: #333; border: 1px solid #ddd; border-radius: 10px; padding: 13px; font-size: 14px; width: 100%; cursor: pointer; margin-bottom: 10px; }
+    .btn-ghost:hover { background: #ebebeb; }
+    .btn-sm { font-size: 12px; padding: 7px 16px; border-radius: 7px; border: 1px solid #ddd; background: #f5f5f5; cursor: pointer; color: #333; }
+    .btn-sm.blue { background: #185FA5; color: #fff; border-color: #185FA5; }
+    label { display: block; font-size: 12px; color: #888; margin-bottom: 5px; margin-top: 14px; }
+    .field-static { background: #f8f8f8; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #444; border: 1px solid #eee; }
+    select, textarea, input[type=text], input[type=password], input[type=email] { background: #fff; border-radius: 8px; padding: 10px 12px; font-size: 13px; color: #222; border: 1px solid #ccc; width: 100%; font-family: inherit; }
+    select:focus, textarea:focus, input:focus { outline: none; border-color: #185FA5; }
+    textarea { resize: none; height: 84px; }
+    hr { border: none; border-top: 1px solid #f0f0f0; margin: 16px 0; }
+    .back-btn { background: none; border: none; color: #185FA5; font-size: 13px; cursor: pointer; padding: 0 0 16px; display: block; }
+    .confirm-center { text-align: center; padding: 8px 0; }
+    .confirm-icon { width: 54px; height: 54px; border-radius: 50%; background: #EAF3DE; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .ticket-id { font-size: 22px; font-weight: 700; color: #185FA5; margin: 8px 0 10px; }
+    .dept-pill { display: inline-block; font-size: 11px; padding: 4px 14px; border-radius: 20px; background: #E6F1FB; color: #185FA5; margin-bottom: 16px; }
+    .confirm-note { font-size: 12px; color: #999; margin-bottom: 18px; }
+    .ticket-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid #f0f0f0; cursor:pointer; }
+    .t-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .t-info { flex: 1; } .t-title { font-size: 13px; font-weight: 500; color: #222; }
+    .t-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+    .t-badge { font-size: 10px; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
+    .b-open { background: #FAEEDA; color: #633806; } .b-progress { background: #E6F1FB; color: #0C447C; } .b-resolved { background: #EAF3DE; color: #3B6D11; }
+    .error { font-size: 12px; color: #c0392b; margin-top: 8px; display: none; }
+    .change-log { background: #FAEEDA; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #633806; margin-bottom: 14px; }
+    .stats-row { display: flex; gap: 10px; margin-bottom: 20px; }
+    .stat-card { flex: 1; background: #f8f8f8; border-radius: 10px; padding: 12px; text-align: center; border: 1px solid #eee; }
+    .stat-num { font-size: 22px; font-weight: 700; color: #185FA5; } .stat-label { font-size: 11px; color: #aaa; margin-top: 2px; }
+    .admin-section { margin-bottom: 20px; }
+    .admin-building-header { background: #185FA5; color: #E6F1FB; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .admin-ticket { background: #f8f8f8; border-radius: 8px; padding: 12px; margin-bottom: 8px; border: 1px solid #eee; }
+    .admin-ticket-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+    .admin-ticket-id { font-size: 11px; color: #aaa; } .admin-ticket-type { font-size: 13px; font-weight: 600; color: #222; }
+    .admin-ticket-detail { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .admin-status-select { font-size: 11px; padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; background: #fff; cursor: pointer; width: auto; }
+    .search-box { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px; margin-bottom: 16px; font-family: inherit; }
+    .search-box:focus { outline: none; border-color: #185FA5; }
+    .no-tickets { font-size: 13px; color: #aaa; text-align: center; padding: 20px 0; }
+    .urgency-critical { background: #FCEBEB; color: #A32D2D; border-left: 3px solid #E24B4A; }
+    .urgency-high { background: #FAEEDA; color: #633806; border-left: 3px solid #EF9F27; }
+    .urgency-medium { background: #E6F1FB; color: #0C447C; border-left: 3px solid #378ADD; }
+    .urgency-low { background: #EAF3DE; color: #3B6D11; border-left: 3px solid #639922; }
+    .urgency-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; flex-shrink: 0; letter-spacing: 0.03em; }
+    .badge-critical { background: #FCEBEB; color: #A32D2D; } .badge-high { background: #FAEEDA; color: #633806; }
+    .badge-medium { background: #E6F1FB; color: #0C447C; } .badge-low { background: #EAF3DE; color: #3B6D11; }
+    .override-tag { font-size: 9px; color: #aaa; margin-left: 6px; }
+    .dash-card { background: #f8f8f8; border-radius: 10px; padding: 14px; border: 1px solid #eee; }
+    .dash-card-title { font-size: 11px; color: #aaa; margin-bottom: 10px; letter-spacing: 0.03em; }
+    .urgency-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .urgency-bar-label { font-size: 11px; width: 55px; flex-shrink: 0; color: #555; }
+    .urgency-bar-track { flex: 1; background: #eee; border-radius: 20px; height: 8px; overflow: hidden; }
+    .urgency-bar-fill { height: 8px; border-radius: 20px; transition: width 0.4s; }
+    .urgency-bar-count { font-size: 11px; color: #888; width: 20px; text-align: right; }
+    .building-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f0f0f0; }
+    .building-row:last-child { border-bottom: none; }
+    .building-name { font-size: 12px; color: #333; flex: 1; }
+    .building-count { font-size: 11px; font-weight: 600; color: #185FA5; width: 24px; text-align: center; }
+    .building-dots { display: flex; gap: 3px; } .building-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .suggestion-card { background: #f0f6ff; border-radius: 10px; padding: 14px; border: 1px solid #cce0ff; margin-bottom: 10px; }
+    .suggestion-title { font-size: 13px; font-weight: 600; color: #185FA5; margin-bottom: 4px; }
+    .suggestion-desc { font-size: 12px; color: #555; line-height: 1.6; }
+    .admin-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+    .admin-tab { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f5f5f5; font-size: 12px; cursor: pointer; text-align: center; color: #555; }
+    .admin-tab.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+    /* NEW: Drop zone */
+    .drop-zone { border: 2px dashed #ccc; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
+    .drop-zone.dragover { border-color: #185FA5; background: #f0f6ff; }
+    .drop-zone-text { font-size: 12px; color: #888; }
+    /* NEW: Thumbnail preview */
+    .preview-strip { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 4px; }
+    .preview-thumb { position: relative; width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; flex-shrink: 0; }
+    .preview-thumb img, .preview-thumb video { width: 100%; height: 100%; object-fit: cover; }
+    .preview-remove { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    /* NEW: Lightbox */
+    .lightbox { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; }
+    .lightbox.active { display: flex; }
+    .lightbox img, .lightbox video { max-width: 90%; max-height: 90%; border-radius: 8px; }
+    .lightbox-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; }
+    /* NEW: Attachment thumbs in admin */
+    .attach-strip { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .attach-thumb { width: 44px; height: 44px; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid #ddd; }
+    .attach-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .attach-count { font-size: 11px; color: #185FA5; }
+    /* NEW: Loading */
+    .loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 999; display: none; align-items: center; justify-content: center; }
+    .loading.active { display: flex; }
+    .spinner { width: 32px; height: 32px; border: 3px solid #eee; border-top-color: #185FA5; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="nav">
+    <div><div class="nav-title">TenantDesk</div><div class="nav-sub" id="nav-sub">Maintenance Portal</div></div>
+    <div class="nav-right">
+      <button class="nav-admin-btn" id="admin-nav-btn" onclick="goTo('page-admin-login')">Admin</button>
+      <div class="nav-avatar" id="nav-avatar" style="display:none" onclick="logout()">--</div>
+    </div>
+  </div>
+  <div class="body">
+    <!-- LOGIN -->
+    <div class="page active" id="page-login">
+      <div style="padding-top:20px">
+        <h2>Welcome back</h2>
+        <div class="sub">Sign in to report or track issues</div>
+        <label>Email address</label>
+        <input type="email" id="login-email" placeholder="your@email.com" />
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="••••••••" />
+        <div class="error" id="login-error">Email not found or wrong password.</div>
+        <button class="btn-primary" style="margin-top:20px" onclick="doLogin()">Sign in</button>
+        <div style="font-size:12px;color:#aaa;text-align:center;margin-top:8px">Password for all accounts: 1234</div>
+        <div style="font-size:12px;color:#aaa;text-align:center;margin-top:4px">Example: john.smith@tenantdesk.com</div>
+      </div>
+    </div>
+    <!-- DASHBOARD -->
+    <div class="page" id="page-dashboard">
+      <h2 id="dash-greeting">Hello</h2>
+      <div class="sub" id="dash-sub"></div>
+      <div class="change-log" id="change-log" style="display:none"></div>
+      <div class="info-card">
+        <div class="info-card-label">
+          <span>YOUR UNIT <span id="auto-badge-lbl" class="auto-badge">auto-filled</span></span>
+          <button class="edit-link" id="edit-toggle-btn" onclick="toggleEdit()">Edit details</button>
+        </div>
+        <div class="info-row"><span class="info-key">Name</span><span class="info-val" id="d-name"></span></div>
+        <div class="info-row"><span class="info-key">Location</span><span class="info-val" id="d-location-display"></span><input type="text" class="edit-inline" id="d-location-input" style="display:none" /></div>
+        <div class="info-row"><span class="info-key">Wing</span><span class="info-val" id="d-wing-display"></span><input type="text" class="edit-inline" id="d-wing-input" style="display:none" /></div>
+        <div class="info-row"><span class="info-key">Flat</span><span class="info-val" id="d-flat-display"></span><input type="text" class="edit-inline" id="d-flat-input" style="display:none" /></div>
+        <div class="info-row"><span class="info-key">Contact</span><span class="info-val" id="d-contact"></span></div>
+        <div class="edit-actions" id="edit-actions">
+          <button class="btn-sm blue" onclick="saveEdit()">Save changes</button>
+          <button class="btn-sm" onclick="cancelEdit()">Cancel</button>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="goTo('page-report')">+ Report an issue</button>
+      <button class="btn-ghost" onclick="goTo('page-tickets')">View my tickets</button>
+    </div>
+    <!-- REPORT -->
+    <div class="page" id="page-report">
+      <button class="back-btn" onclick="goTo('page-dashboard')">&#8592; Back</button>
+      <h2>New request</h2>
+      <div class="sub">Your details are auto-filled</div>
+      <label>Name <span class="auto-badge">auto</span></label>
+      <div class="field-static" id="r-name"></div>
+      <label>Location <span class="auto-badge">auto</span></label>
+      <div class="field-static" id="r-location"></div>
+      <label>Unit <span class="auto-badge">auto</span></label>
+      <div class="field-static" id="r-unit"></div>
+      <hr>
+      <label>Issue type</label>
+      <select id="issue-type">
+        <option value="">Select an issue...</option>
+        <option>Water leak</option><option>Electricity problem</option><option>AC not working</option>
+        <option>Broken door / window</option><option>Plumbing issue</option><option>Elevator issue</option>
+        <option>Pest / insects</option><option>Sewage / flooding</option><option>Fire or safety hazard</option>
+        <option>Gas leak</option><option>Broken window / latch</option><option>Other</option>
+      </select>
+      <label>Describe the problem</label>
+      <textarea id="issue-desc" placeholder="Briefly describe what's happening..."></textarea>
+      <!-- File Upload -->
+      <label>Attach photos / videos <span style="font-size:11px;color:#aaa">(max 5, 10MB each)</span></label>
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <div style="font-size:22px;margin-bottom:4px">📎</div>
+        <div class="drop-zone-text">Drag files here or <span style="color:#185FA5;text-decoration:underline">browse</span></div>
+      </div>
+      <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFiles(this.files)" />
+      <div class="preview-strip" id="preview-strip"></div>
+      <button class="btn-primary" style="margin-top:16px" onclick="submitTicket()">Submit request</button>
+    </div>
+    <!-- CONFIRMATION -->
+    <div class="page" id="page-confirm">
+      <div class="confirm-center">
+        <div class="confirm-icon"><svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M5 13.5L10.5 19L21 8" stroke="#3B6D11" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h2>Request submitted!</h2>
+        <div class="ticket-id" id="ticket-num"></div>
+        <div class="dept-pill">Assigned to Maintenance</div>
+        <div class="info-card" style="text-align:left">
+          <div class="info-row"><span class="info-key">Issue</span><span class="info-val" id="conf-issue"></span></div>
+          <div class="info-row"><span class="info-key">Priority</span><span class="info-val" id="conf-urgency"></span></div>
+          <div class="info-row"><span class="info-key">Location</span><span class="info-val" id="conf-location"></span></div>
+          <div class="info-row"><span class="info-key">Attachments</span><span class="info-val" id="conf-attach">0 files</span></div>
+          <div class="info-row"><span class="info-key">Status</span><span class="info-val" style="color:#BA7517">Open</span></div>
+          <div class="info-row"><span class="info-key">Submitted</span><span class="info-val" id="conf-time"></span></div>
+        </div>
+        <div class="confirm-note">The maintenance team has been notified.</div>
+        <button class="btn-primary" onclick="goTo('page-tickets')">View my tickets</button>
+        <button class="btn-ghost" onclick="goTo('page-dashboard')">Back to home</button>
+      </div>
+    </div>
+    <!-- MY TICKETS -->
+    <div class="page" id="page-tickets">
+      <button class="back-btn" onclick="goTo('page-dashboard')">&#8592; Back</button>
+      <h2>My requests</h2>
+      <div class="sub" style="margin-bottom:16px">Track your reported issues</div>
+      <div id="tickets-list"></div>
+    </div>
+    <!-- ADMIN LOGIN -->
+    <div class="page" id="page-admin-login">
+      <div style="padding-top:20px">
+        <button class="back-btn" onclick="goTo('page-login')">&#8592; Back</button>
+        <h2>Admin portal</h2>
+        <div class="sub">Sign in with your admin credentials</div>
+        <label>Username</label><input type="text" id="admin-user" placeholder="admin" />
+        <label>Password</label><input type="password" id="admin-pass" placeholder="••••••••" />
+        <div class="error" id="admin-error">Wrong credentials. Try: admin / admin123</div>
+        <button class="btn-primary" style="margin-top:20px" onclick="doAdminLogin()">Sign in as admin</button>
+        <div style="font-size:12px;color:#aaa;text-align:center;margin-top:8px">Demo: admin / admin123</div>
+      </div>
+    </div>
+    <!-- ADMIN DASHBOARD -->
+    <div class="page" id="page-admin">
+      <h2>Admin portal</h2><div class="sub">All tickets — live overview</div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">Total</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-open">0</div><div class="stat-label">Open</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-progress">0</div><div class="stat-label">In progress</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-resolved">0</div><div class="stat-label">Resolved</div></div>
+      </div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" id="tab-dashboard" onclick="switchAdminTab('dashboard')">📊 Dashboard</button>
+        <button class="admin-tab" id="tab-tickets" onclick="switchAdminTab('tickets')">🎫 Tickets</button>
+      </div>
+      <div id="admin-tab-dashboard">
+        <div class="dash-card" style="margin-bottom:12px">
+          <div class="dash-card-title">URGENCY BREAKDOWN</div>
+          <div class="urgency-bar-row"><span class="urgency-bar-label" style="color:#A32D2D">Critical</span><div class="urgency-bar-track"><div class="urgency-bar-fill" id="bar-critical" style="background:#E24B4A;width:0%"></div></div><span class="urgency-bar-count" id="cnt-critical">0</span></div>
+          <div class="urgency-bar-row"><span class="urgency-bar-label" style="color:#633806">High</span><div class="urgency-bar-track"><div class="urgency-bar-fill" id="bar-high" style="background:#EF9F27;width:0%"></div></div><span class="urgency-bar-count" id="cnt-high">0</span></div>
+          <div class="urgency-bar-row"><span class="urgency-bar-label" style="color:#0C447C">Medium</span><div class="urgency-bar-track"><div class="urgency-bar-fill" id="bar-medium" style="background:#378ADD;width:0%"></div></div><span class="urgency-bar-count" id="cnt-medium">0</span></div>
+          <div class="urgency-bar-row"><span class="urgency-bar-label" style="color:#3B6D11">Low</span><div class="urgency-bar-track"><div class="urgency-bar-fill" id="bar-low" style="background:#639922;width:0%"></div></div><span class="urgency-bar-count" id="cnt-low">0</span></div>
+        </div>
+        <div class="dash-card" style="margin-bottom:12px"><div class="dash-card-title">BUILDING HEATMAP</div><div id="building-heatmap"><p class="no-tickets">No tickets yet.</p></div></div>
+        <div style="margin-bottom:12px"><div style="font-size:11px;color:#aaa;letter-spacing:0.03em;margin-bottom:8px">SMART SUGGESTIONS</div><div id="suggestions-panel"><p class="no-tickets">Submit tickets to see suggestions.</p></div></div>
+      </div>
+      <div id="admin-tab-tickets" style="display:none">
+        <input class="search-box" type="text" id="admin-search" placeholder="Search by tenant, building, or issue..." oninput="renderAdminTickets()" />
+        <div id="admin-tickets-list"></div>
+      </div>
+      <button class="btn-ghost" style="margin-top:8px" onclick="adminLogout()">Sign out of admin</button>
+    </div>
+  </div>
+</div>
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <div id="lightbox-content"></div>
+</div>
+<!-- Loading -->
+<div class="loading" id="loading"><div class="spinner"></div></div>
+
+<script>
+/* === STATE === */
+let currentUser = null;
+let allTickets = [];
+let selectedFiles = [];
+let isAdmin = false;
+let changeLog = [];
+
+/* === HELPERS === */
+function esc(s) { const d = document.createElement('div'); d.appendChild(document.createTextNode(s||'')); return d.innerHTML; }
+function show(id) { document.getElementById(id).style.display = 'flex'; }
+function hide(id) { document.getElementById(id).style.display = 'none'; }
+function showLoading() { document.getElementById('loading').classList.add('active'); }
+function hideLoading() { document.getElementById('loading').classList.remove('active'); }
+
+async function api(url, opts = {}) {
+  const res = await fetch(url, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+/* === NAVIGATION === */
+function goTo(p) {
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById(p).classList.add('active');
+  if (p==='page-tickets') renderMyTickets();
+  if (p==='page-admin') renderAdmin();
+  if (p==='page-dashboard') renderDashboard();
+  if (p==='page-report') renderReportPrefill();
+}
+
+/* === AUTH === */
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value.trim();
+  try {
+    showLoading();
+    currentUser = await api('/api/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email,password:pass}) });
+    currentUser.edited = false; changeLog = [];
+    document.getElementById('login-error').style.display='none';
+    const initials = currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('nav-avatar').style.display='flex';
+    document.getElementById('nav-avatar').textContent=initials;
+    document.getElementById('nav-sub').textContent=currentUser.location;
+    document.getElementById('admin-nav-btn').style.display='none';
+    goTo('page-dashboard');
+  } catch(e) { document.getElementById('login-error').style.display='block'; }
+  finally { hideLoading(); }
+}
+async function doAdminLogin() {
+  const u = document.getElementById('admin-user').value.trim();
+  const p = document.getElementById('admin-pass').value.trim();
+  try {
+    showLoading();
+    await api('/api/admin/login', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u,password:p}) });
+    isAdmin = true;
+    document.getElementById('admin-error').style.display='none';
+    document.getElementById('nav-sub').textContent='Admin View';
+    document.getElementById('nav-avatar').style.display='none';
+    document.getElementById('admin-nav-btn').style.display='none';
+    goTo('page-admin');
+  } catch(e) { document.getElementById('admin-error').style.display='block'; }
+  finally { hideLoading(); }
+}
+function logout() {
+  currentUser=null; changeLog=[];
+  document.getElementById('nav-avatar').style.display='none';
+  document.getElementById('admin-nav-btn').style.display='';
+  document.getElementById('nav-sub').textContent='Maintenance Portal';
+  document.getElementById('login-email').value=''; document.getElementById('login-pass').value='';
+  document.getElementById('login-error').style.display='none';
+  goTo('page-login');
+}
+function adminLogout() {
+  isAdmin=false;
+  document.getElementById('admin-user').value=''; document.getElementById('admin-pass').value='';
+  document.getElementById('nav-sub').textContent='Maintenance Portal';
+  document.getElementById('admin-nav-btn').style.display='';
+  if (currentUser) {
+    const i=currentUser.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('nav-avatar').style.display='flex';
+    document.getElementById('nav-avatar').textContent=i;
+    document.getElementById('nav-sub').textContent=currentUser.location;
+    document.getElementById('admin-nav-btn').style.display='none';
+    goTo('page-dashboard');
+  } else { goTo('page-login'); }
+}
+
+/* === DASHBOARD === */
+function renderDashboard() {
+  if (!currentUser) return;
+  const h=new Date().getHours();
+  const g=h<12?'Good morning':h<17?'Good afternoon':'Good evening';
+  document.getElementById('dash-greeting').textContent=g+', '+currentUser.name.split(' ')[0];
+  document.getElementById('dash-sub').textContent=currentUser.location+' — Wing '+currentUser.wing+', Flat '+currentUser.flat;
+  document.getElementById('d-name').textContent=currentUser.name;
+  document.getElementById('d-location-display').textContent=currentUser.location;
+  document.getElementById('d-wing-display').textContent=currentUser.wing;
+  document.getElementById('d-flat-display').textContent=currentUser.flat;
+  document.getElementById('d-contact').textContent=currentUser.contact;
+  const badge=document.getElementById('auto-badge-lbl');
+  if (currentUser.edited) { badge.className='edited-badge'; badge.textContent='edited by tenant'; }
+  else { badge.className='auto-badge'; badge.textContent='auto-filled'; }
+  const log=document.getElementById('change-log');
+  if (changeLog.length>0) { log.style.display='block'; log.innerHTML='<strong>Edit history:</strong><br>'+changeLog.join('<br>'); }
+  else { log.style.display='none'; }
+}
+function renderReportPrefill() {
+  if (!currentUser) return;
+  document.getElementById('r-name').textContent=currentUser.name;
+  document.getElementById('r-location').textContent=currentUser.location;
+  document.getElementById('r-unit').textContent='Wing '+currentUser.wing+', Flat '+currentUser.flat;
+  selectedFiles=[]; renderPreviews();
+  document.getElementById('issue-type').value=''; document.getElementById('issue-desc').value='';
+}
+function toggleEdit() {
+  const isEditing=document.getElementById('d-location-input').style.display!=='none';
+  if (isEditing){cancelEdit();return;}
+  ['location','wing','flat'].forEach(f=>{
+    document.getElementById('d-'+f+'-display').style.display='none';
+    const inp=document.getElementById('d-'+f+'-input'); inp.style.display=''; inp.value=currentUser[f];
+  });
+  document.getElementById('edit-actions').style.display='flex';
+  document.getElementById('edit-toggle-btn').textContent='Cancel';
+}
+async function saveEdit() {
+  const updates={}, changes=[];
+  ['location','wing','flat'].forEach(f=>{
+    const v=document.getElementById('d-'+f+'-input').value.trim();
+    if (v && v!==currentUser[f]) { updates[f]=v; changes.push(f+': "'+currentUser[f]+'" → "'+v+'"'); }
+  });
+  if (Object.keys(updates).length>0) {
+    try {
+      showLoading();
+      currentUser = await api('/api/tenant/'+encodeURIComponent(currentUser.email), {
+        method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(updates)
+      });
+      currentUser.edited=true;
+      const now=new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+      changeLog.push('['+now+'] '+changes.join(', '));
+    } catch(e){ alert('Save failed: '+e.message); }
+    finally { hideLoading(); }
+  }
+  cancelEdit(); renderDashboard();
+}
+function cancelEdit() {
+  ['location','wing','flat'].forEach(f=>{
+    document.getElementById('d-'+f+'-display').style.display='';
+    document.getElementById('d-'+f+'-input').style.display='none';
+  });
+  document.getElementById('edit-actions').style.display='none';
+  document.getElementById('edit-toggle-btn').textContent='Edit details';
+}
+
+/* === FILE UPLOAD === */
+function handleFiles(fileList) {
+  for (const f of fileList) {
+    if (selectedFiles.length>=5){alert('Max 5 files');break;}
+    if (f.size>10*1024*1024){alert(f.name+' exceeds 10MB');continue;}
+    if (!f.type.startsWith('image/')&&!f.type.startsWith('video/')){alert(f.name+': invalid type');continue;}
+    selectedFiles.push(f);
+  }
+  renderPreviews();
+}
+function renderPreviews() {
+  const s=document.getElementById('preview-strip');
+  s.innerHTML=selectedFiles.map((f,i)=>{
+    const url=URL.createObjectURL(f), isV=f.type.startsWith('video/');
+    return '<div class="preview-thumb">'+(isV?'<video src="'+url+'" muted></video>':'<img src="'+url+'" />')+'<button class="preview-remove" onclick="removeFile('+i+')">✕</button></div>';
+  }).join('');
+}
+function removeFile(i){selectedFiles.splice(i,1);renderPreviews();}
+
+// Drag and drop
+document.addEventListener('DOMContentLoaded',()=>{
+  const z=document.getElementById('drop-zone');
+  z.addEventListener('dragover',e=>{e.preventDefault();z.classList.add('dragover');});
+  z.addEventListener('dragleave',()=>z.classList.remove('dragover'));
+  z.addEventListener('drop',e=>{e.preventDefault();z.classList.remove('dragover');handleFiles(e.dataTransfer.files);});
+});
+
+/* === SUBMIT TICKET === */
+async function submitTicket() {
+  const type=document.getElementById('issue-type').value;
+  const desc=document.getElementById('issue-desc').value.trim();
+  if (!type){alert('Please select an issue type.');return;}
+  if (!desc){alert('Please describe the problem.');return;}
+  try {
+    showLoading();
+    const fd=new FormData();
+    fd.append('type',type); fd.append('desc',desc);
+    fd.append('tenantEmail',currentUser.email);
+    fd.append('locationEdited',String(currentUser.edited||false));
+    selectedFiles.forEach(f=>fd.append('attachments',f));
+    const ticket = await api('/api/tickets', {method:'POST',body:fd});
+    document.getElementById('ticket-num').textContent=ticket.id;
+    document.getElementById('conf-issue').textContent=ticket.type;
+    document.getElementById('conf-urgency').textContent=ticket.urgency.charAt(0).toUpperCase()+ticket.urgency.slice(1);
+    document.getElementById('conf-location').textContent=ticket.location;
+    document.getElementById('conf-attach').textContent=(ticket.attachments||[]).length+' file(s)';
+    document.getElementById('conf-time').textContent=ticket.time;
+    selectedFiles=[];
+    goTo('page-confirm');
+  } catch(e){alert('Failed: '+e.message);}
+  finally{hideLoading();}
+}
+
+/* === MY TICKETS === */
+async function renderMyTickets() {
+  if (!currentUser) return;
+  const list=document.getElementById('tickets-list');
+  try {
+    showLoading();
+    const mine = await api('/api/tickets?email='+encodeURIComponent(currentUser.email));
+    if (!mine.length){list.innerHTML='<p class="no-tickets">No tickets yet.</p>';return;}
+    list.innerHTML=mine.map(tk=>{
+      const dot=tk.status==='open'?'#E24B4A':tk.status==='progress'?'#378ADD':'#639922';
+      const cls=tk.status==='open'?'b-open':tk.status==='progress'?'b-progress':'b-resolved';
+      const lbl=tk.status==='open'?'Open':tk.status==='progress'?'In progress':'Resolved';
+      const att=(tk.attachments||[]).length;
+      const attBadge=att>0?' <span class="attach-count">📎'+att+'</span>':'';
+      return '<div class="ticket-row"><div class="t-dot" style="background:'+dot+'"></div><div class="t-info"><div class="t-title">'+esc(tk.type)+attBadge+'</div><div class="t-sub">'+tk.id+' &middot; '+tk.time+'</div></div><div class="t-badge '+cls+'">'+lbl+'</div></div>';
+    }).join('');
+  } catch(e){list.innerHTML='<p class="no-tickets">Error loading tickets.</p>';}
+  finally{hideLoading();}
+}
+
+/* === ADMIN === */
+async function renderAdmin() {
+  try {
+    showLoading();
+    allTickets = await api('/api/tickets');
+    document.getElementById('stat-total').textContent=allTickets.length;
+    document.getElementById('stat-open').textContent=allTickets.filter(t=>t.status==='open').length;
+    document.getElementById('stat-progress').textContent=allTickets.filter(t=>t.status==='progress').length;
+    document.getElementById('stat-resolved').textContent=allTickets.filter(t=>t.status==='resolved').length;
+    switchAdminTab('dashboard');
+  } catch(e){console.error(e);}
+  finally{hideLoading();}
+}
+function switchAdminTab(tab) {
+  document.getElementById('admin-tab-dashboard').style.display=tab==='dashboard'?'':'none';
+  document.getElementById('admin-tab-tickets').style.display=tab==='tickets'?'':'none';
+  document.getElementById('tab-dashboard').classList.toggle('active',tab==='dashboard');
+  document.getElementById('tab-tickets').classList.toggle('active',tab==='tickets');
+  if (tab==='tickets') renderAdminTickets();
+  if (tab==='dashboard') renderAdminDashboard();
+}
+function renderAdminDashboard() {
+  const open=allTickets.filter(t=>t.status!=='resolved');
+  const counts={critical:0,high:0,medium:0,low:0};
+  open.forEach(t=>{if(counts[t.urgency]!==undefined)counts[t.urgency]++;});
+  const mx=Math.max(...Object.values(counts),1);
+  ['critical','high','medium','low'].forEach(u=>{
+    document.getElementById('cnt-'+u).textContent=counts[u];
+    document.getElementById('bar-'+u).style.width=Math.round((counts[u]/mx)*100)+'%';
+  });
+  const byB={};
+  allTickets.forEach(tk=>{const b=tk.location.split(',')[0].trim();if(!byB[b])byB[b]={total:0,critical:0,high:0,medium:0,low:0};byB[b].total++;if(byB[b][tk.urgency]!==undefined)byB[b][tk.urgency]++;});
+  const hm=document.getElementById('building-heatmap');
+  const sorted=Object.entries(byB).sort((a,b)=>b[1].total-a[1].total);
+  if(!sorted.length){hm.innerHTML='<p class="no-tickets">No tickets yet.</p>';}
+  else{
+    hm.innerHTML=sorted.map(([name,d])=>{
+      const dotC={critical:'#E24B4A',high:'#EF9F27',medium:'#378ADD',low:'#639922'};
+      let dots=[];['critical','high','medium','low'].forEach(u=>{for(let i=0;i<Math.min(d[u],4);i++)dots.push(dotC[u]);});
+      return '<div class="building-row"><span class="building-name">'+esc(name)+'</span><div class="building-dots">'+dots.slice(0,10).map(c=>'<span class="building-dot" style="background:'+c+'"></span>').join('')+'</div><span class="building-count">'+d.total+'</span></div>';
+    }).join('');
+  }
+  const sugg=[];
+  if(counts.critical>=2) sugg.push({t:'⚠️ Multiple critical issues',d:counts.critical+' critical tickets unresolved. Dispatch maintenance urgently.'});
+  const top=sorted[0]; if(top&&top[1].total>=3) sugg.push({t:'🏢 High load: '+top[0],d:top[0]+' has '+top[1].total+' tickets.'});
+  const ac=allTickets.filter(t=>t.type==='AC not working').length; if(ac>=2) sugg.push({t:'❄️ AC issues clustering',d:ac+' AC tickets. Possible shared HVAC fault.'});
+  if(!sugg.length&&allTickets.length>0) sugg.push({t:'✅ All looks healthy',d:'No unusual patterns detected.'});
+  const sp=document.getElementById('suggestions-panel');
+  if(!allTickets.length){sp.innerHTML='<p class="no-tickets">Submit tickets to see suggestions.</p>';}
+  else{sp.innerHTML=sugg.map(s=>'<div class="suggestion-card"><div class="suggestion-title">'+s.t+'</div><div class="suggestion-desc">'+s.d+'</div></div>').join('');}
+}
+function renderAdminTickets() {
+  const search=(document.getElementById('admin-search').value||'').toLowerCase();
+  const filtered=allTickets.filter(tk=>!search||tk.tenantName.toLowerCase().includes(search)||tk.location.toLowerCase().includes(search)||tk.type.toLowerCase().includes(search));
+  const byB={};
+  filtered.forEach(tk=>{const b=tk.location.split(',')[0].trim();if(!byB[b])byB[b]=[];byB[b].push(tk);});
+  const container=document.getElementById('admin-tickets-list');
+  if(!filtered.length){container.innerHTML='<div class="no-tickets">No tickets found.</div>';return;}
+  const uo={critical:0,high:1,medium:2,low:3};
+  container.innerHTML=Object.keys(byB).map(bld=>{
+    const tks=byB[bld]; tks.sort((a,b)=>uo[a.urgency]-uo[b.urgency]);
+    const rows=tks.map(tk=>{
+      const ed=tk.locationEdited?' <span style="font-size:10px;background:#FAEEDA;color:#633806;padding:1px 6px;border-radius:4px">edited</span>':'';
+      const ul=tk.urgency.charAt(0).toUpperCase()+tk.urgency.slice(1);
+      const ot=tk.urgencyOverridden?'<span class="override-tag">manually set</span>':'';
+      const tr=tk.triageReason?'<div style="font-size:10px;color:#999;margin-top:2px">🤖 '+esc(tk.triageReason)+'</div>':'';
+      // Attachments
+      let attHtml='';
+      if(tk.attachments&&tk.attachments.length){
+        attHtml='<div class="attach-strip">'+tk.attachments.map(a=>'<div class="attach-thumb" onclick="openLightbox(\'/api/attachments/'+a.id+'\')"><img src="/api/attachments/'+a.id+'" loading="lazy" /></div>').join('')+'</div>';
+      }
+      return '<div class="admin-ticket urgency-'+tk.urgency+'">'+
+        '<div class="admin-ticket-top"><div><div class="admin-ticket-id">'+tk.id+' &middot; '+tk.time+'</div><div class="admin-ticket-type">'+esc(tk.type)+'</div></div>'+
+        '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">'+
+        '<select class="admin-status-select" onchange="updateStatus(\''+tk.id+'\',this.value)"><option value="open"'+(tk.status==='open'?' selected':'')+'>Open</option><option value="progress"'+(tk.status==='progress'?' selected':'')+'>In progress</option><option value="resolved"'+(tk.status==='resolved'?' selected':'')+'>Resolved</option></select>'+
+        '<div style="display:flex;align-items:center;gap:4px"><span class="urgency-badge badge-'+tk.urgency+'">'+ul+'</span>'+ot+
+        '<select class="admin-status-select" style="font-size:10px;padding:2px 5px" onchange="overrideUrgency(\''+tk.id+'\',this.value)"><option value="">Override…</option>'+['critical','high','medium','low'].map(u=>'<option value="'+u+'"'+(tk.urgency===u&&tk.urgencyOverridden?' selected':'')+'>'+u.charAt(0).toUpperCase()+u.slice(1)+'</option>').join('')+'</select></div></div></div>'+
+        '<div class="admin-ticket-detail"><strong>Tenant:</strong> '+esc(tk.tenantName)+' | <strong>Contact:</strong> '+esc(tk.contact)+'</div>'+
+        '<div class="admin-ticket-detail"><strong>Location:</strong> '+esc(tk.location)+ed+'</div>'+
+        '<div class="admin-ticket-detail"><strong>Wing:</strong> '+esc(tk.wing)+' | <strong>Flat:</strong> '+esc(tk.flat)+'</div>'+
+        tr+
+        '<div class="admin-ticket-detail" style="color:#888;font-style:italic;margin-top:4px">'+esc(tk.desc)+'</div>'+
+        attHtml+'</div>';
+    }).join('');
+    return '<div class="admin-section"><div class="admin-building-header"><span>'+esc(bld)+'</span><span style="font-size:11px;opacity:0.8">'+tks.length+' ticket'+(tks.length>1?'s':'')+'</span></div>'+rows+'</div>';
+  }).join('');
+}
+async function updateStatus(id, st) {
+  const tk=allTickets.find(t=>t.id===id); if(tk) tk.status=st;
+  renderAdminTickets(); renderAdminDashboard(); updateStats();
+  try { await api('/api/tickets/'+id+'/status',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:st})}); }
+  catch(e){console.error('Sync failed:',e);}
+}
+async function overrideUrgency(id, u) {
+  if(!u)return;
+  const tk=allTickets.find(t=>t.id===id); if(tk){tk.urgency=u;tk.urgencyOverridden=true;}
+  renderAdminTickets(); renderAdminDashboard();
+  try { await api('/api/tickets/'+id+'/urgency',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({urgency:u})}); }
+  catch(e){console.error('Sync failed:',e);}
+}
+function updateStats() {
+  document.getElementById('stat-total').textContent=allTickets.length;
+  document.getElementById('stat-open').textContent=allTickets.filter(t=>t.status==='open').length;
+  document.getElementById('stat-progress').textContent=allTickets.filter(t=>t.status==='progress').length;
+  document.getElementById('stat-resolved').textContent=allTickets.filter(t=>t.status==='resolved').length;
+}
+
+/* === LIGHTBOX === */
+function openLightbox(src) {
+  const c=document.getElementById('lightbox-content');
+  c.innerHTML='<img src="'+src+'" style="max-width:90vw;max-height:90vh" />';
+  document.getElementById('lightbox').classList.add('active');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('active'); }
+</script>
+</body>
+</html>

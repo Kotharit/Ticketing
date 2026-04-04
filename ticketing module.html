@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="TenantDesk — Tenant maintenance ticketing portal for reporting and tracking building issues." />
+  <title>TenantDesk</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 480px;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav {
+      background: #185FA5;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-title {
+      color: #E6F1FB;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .nav-sub {
+      color: #85B7EB;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #378ADD;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .nav-admin-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: none;
+      color: #E6F1FB;
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .nav-admin-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .body {
+      padding: 22px 18px;
+      flex: 1;
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .sub {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 20px;
+    }
+
+    .auto-badge {
+      display: inline-block;
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #EAF3DE;
+      color: #3B6D11;
+      margin-left: 6px;
+    }
+
+    .edited-badge {
+      display: inline-block;
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: #FAEEDA;
+      color: #633806;
+      margin-left: 6px;
+    }
+
+    .info-card {
+      background: #f8f8f8;
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 18px;
+      border: 1px solid #eee;
+    }
+
+    .info-card-label {
+      font-size: 10px;
+      color: #aaa;
+      letter-spacing: 0.05em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 1px solid #f0f0f0;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-key {
+      color: #999;
+      flex-shrink: 0;
+    }
+
+    .info-val {
+      font-weight: 500;
+      color: #222;
+      text-align: right;
+    }
+
+    .edit-inline {
+      background: #fff;
+      border: 1px solid #185FA5;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font-size: 12px;
+      color: #222;
+      width: 180px;
+    }
+
+    .edit-link {
+      font-size: 11px;
+      color: #185FA5;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 0;
+    }
+
+    .edit-actions {
+      display: none;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .btn-primary {
+      background: #185FA5;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .btn-primary:hover {
+      background: #0C447C;
+    }
+
+    .btn-ghost {
+      background: #f5f5f5;
+      color: #333;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 14px;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .btn-ghost:hover {
+      background: #ebebeb;
+    }
+
+    .btn-sm {
+      font-size: 12px;
+      padding: 7px 16px;
+      border-radius: 7px;
+      border: 1px solid #ddd;
+      background: #f5f5f5;
+      cursor: pointer;
+      color: #333;
+    }
+
+    .btn-sm.blue {
+      background: #185FA5;
+      color: #fff;
+      border-color: #185FA5;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 5px;
+      margin-top: 14px;
+    }
+
+    .field-static {
+      background: #f8f8f8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #444;
+      border: 1px solid #eee;
+    }
+
+    select,
+    textarea,
+    input[type=text],
+    input[type=password],
+    input[type=email] {
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #222;
+      border: 1px solid #ccc;
+      width: 100%;
+      font-family: inherit;
+    }
+
+    select:focus,
+    textarea:focus,
+    input:focus {
+      outline: none;
+      border-color: #185FA5;
+    }
+
+    textarea {
+      resize: none;
+      height: 84px;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #f0f0f0;
+      margin: 16px 0;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: #185FA5;
+      font-size: 13px;
+      cursor: pointer;
+      padding: 0 0 16px;
+      display: block;
+    }
+
+    .confirm-center {
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .confirm-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #EAF3DE;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+    }
+
+    .ticket-id {
+      font-size: 22px;
+      font-weight: 700;
+      color: #185FA5;
+      margin: 8px 0 10px;
+    }
+
+    .dept-pill {
+      display: inline-block;
+      font-size: 11px;
+      padding: 4px 14px;
+      border-radius: 20px;
+      background: #E6F1FB;
+      color: #185FA5;
+      margin-bottom: 16px;
+    }
+
+    .confirm-note {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 18px;
+    }
+
+    .ticket-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .t-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .t-info {
+      flex: 1;
+    }
+
+    .t-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: #222;
+    }
+
+    .t-sub {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    .t-badge {
+      font-size: 10px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    .b-open {
+      background: #FAEEDA;
+      color: #633806;
+    }
+
+    .b-progress {
+      background: #E6F1FB;
+      color: #0C447C;
+    }
+
+    .b-resolved {
+      background: #EAF3DE;
+      color: #3B6D11;
+    }
+
+    .error {
+      font-size: 12px;
+      color: #c0392b;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .change-log {
+      background: #FAEEDA;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #633806;
+      margin-bottom: 14px;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: #f8f8f8;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+      border: 1px solid #eee;
+    }
+
+    .stat-num {
+      font-size: 22px;
+      font-weight: 700;
+      color: #185FA5;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+
+    .admin-section {
+      margin-bottom: 20px;
+    }
+
+    .admin-building-header {
+      background: #185FA5;
+      color: #E6F1FB;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .admin-ticket {
+      background: #f8f8f8;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      border: 1px solid #eee;
+    }
+
+    .admin-ticket-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .admin-ticket-id {
+      font-size: 11px;
+      color: #aaa;
+    }
+
+    .admin-ticket-type {
+      font-size: 13px;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .admin-ticket-detail {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .admin-status-select {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      width: auto;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 13px;
+      margin-bottom: 16px;
+      font-family: inherit;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #185FA5;
+    }
+
+    .no-tickets {
+      font-size: 13px;
+      color: #aaa;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .urgency-critical {
+      background: #FCEBEB;
+      color: #A32D2D;
+      border-left: 3px solid #E24B4A;
+    }
+
+    .urgency-high {
+      background: #FAEEDA;
+      color: #633806;
+      border-left: 3px solid #EF9F27;
+    }
+
+    .urgency-medium {
+      background: #E6F1FB;
+      color: #0C447C;
+      border-left: 3px solid #378ADD;
+    }
+
+    .urgency-low {
+      background: #EAF3DE;
+      color: #3B6D11;
+      border-left: 3px solid #639922;
+    }
+
+    .urgency-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      flex-shrink: 0;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-critical {
+      background: #FCEBEB;
+      color: #A32D2D;
+    }
+
+    .badge-high {
+      background: #FAEEDA;
+      color: #633806;
+    }
+
+    .badge-medium {
+      background: #E6F1FB;
+      color: #0C447C;
+    }
+
+    .badge-low {
+      background: #EAF3DE;
+      color: #3B6D11;
+    }
+
+    .override-tag {
+      font-size: 9px;
+      color: #aaa;
+      margin-left: 6px;
+    }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .dash-card {
+      background: #f8f8f8;
+      border-radius: 10px;
+      padding: 14px;
+      border: 1px solid #eee;
+    }
+
+    .dash-card-title {
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 10px;
+      letter-spacing: 0.03em;
+    }
+
+    .urgency-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .urgency-bar-label {
+      font-size: 11px;
+      width: 55px;
+      flex-shrink: 0;
+      color: #555;
+    }
+
+    .urgency-bar-track {
+      flex: 1;
+      background: #eee;
+      border-radius: 20px;
+      height: 8px;
+      overflow: hidden;
+    }
+
+    .urgency-bar-fill {
+      height: 8px;
+      border-radius: 20px;
+      transition: width 0.4s;
+    }
+
+    .urgency-bar-count {
+      font-size: 11px;
+      color: #888;
+      width: 20px;
+      text-align: right;
+    }
+
+    .building-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .building-row:last-child {
+      border-bottom: none;
+    }
+
+    .building-name {
+      font-size: 12px;
+      color: #333;
+      flex: 1;
+    }
+
+    .building-count {
+      font-size: 11px;
+      font-weight: 600;
+      color: #185FA5;
+      width: 24px;
+      text-align: center;
+    }
+
+    .building-dots {
+      display: flex;
+      gap: 3px;
+    }
+
+    .building-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .suggestion-card {
+      background: #f0f6ff;
+      border-radius: 10px;
+      padding: 14px;
+      border: 1px solid #cce0ff;
+      margin-bottom: 10px;
+    }
+
+    .suggestion-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #185FA5;
+      margin-bottom: 4px;
+    }
+
+    .suggestion-desc {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .admin-tab {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: #f5f5f5;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+      color: #555;
+    }
+
+    .admin-tab.active {
+      background: #185FA5;
+      color: #fff;
+      border-color: #185FA5;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="nav">
+      <div>
+        <div class="nav-title">TenantDesk</div>
+        <div class="nav-sub" id="nav-sub">Maintenance Portal</div>
+      </div>
+      <div class="nav-right">
+        <button class="nav-admin-btn" id="admin-nav-btn" onclick="goTo('page-admin-login')">Admin</button>
+        <div class="nav-avatar" id="nav-avatar" style="display:none" onclick="logout()">--</div>
+      </div>
+    </div>
+
+    <div class="body">
+
+      <!-- LOGIN -->
+      <div class="page active" id="page-login">
+        <div style="padding-top:20px">
+          <h2>Welcome back</h2>
+          <div class="sub">Sign in to report or track issues</div>
+          <label>Email address</label>
+          <input type="email" id="login-email" placeholder="your@email.com" />
+          <label>Password</label>
+          <input type="password" id="login-pass" placeholder="••••••••" />
+          <div class="error" id="login-error">Email not found or wrong password.</div>
+          <button class="btn-primary" style="margin-top:20px" onclick="doLogin()">Sign in</button>
+          <div style="font-size:12px;color:#aaa;text-align:center;margin-top:8px">Password for all accounts: 1234</div>
+          <div style="font-size:12px;color:#aaa;text-align:center;margin-top:4px">Example: john.smith@tenantdesk.com
+          </div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="page" id="page-dashboard">
+        <h2 id="dash-greeting">Hello</h2>
+        <div class="sub" id="dash-sub"></div>
+        <div class="change-log" id="change-log" style="display:none"></div>
+        <div class="info-card">
+          <div class="info-card-label">
+            <span>YOUR UNIT <span id="auto-badge-lbl" class="auto-badge">auto-filled</span></span>
+            <button class="edit-link" id="edit-toggle-btn" onclick="toggleEdit()">Edit details</button>
+          </div>
+          <div class="info-row"><span class="info-key">Name</span><span class="info-val" id="d-name"></span></div>
+          <div class="info-row">
+            <span class="info-key">Location</span>
+            <span class="info-val" id="d-location-display"></span>
+            <input type="text" class="edit-inline" id="d-location-input" style="display:none" />
+          </div>
+          <div class="info-row">
+            <span class="info-key">Wing</span>
+            <span class="info-val" id="d-wing-display"></span>
+            <input type="text" class="edit-inline" id="d-wing-input" style="display:none" />
+          </div>
+          <div class="info-row">
+            <span class="info-key">Flat</span>
+            <span class="info-val" id="d-flat-display"></span>
+            <input type="text" class="edit-inline" id="d-flat-input" style="display:none" />
+          </div>
+          <div class="info-row"><span class="info-key">Contact</span><span class="info-val" id="d-contact"></span></div>
+          <div class="edit-actions" id="edit-actions">
+            <button class="btn-sm blue" onclick="saveEdit()">Save changes</button>
+            <button class="btn-sm" onclick="cancelEdit()">Cancel</button>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goTo('page-report')">+ Report an issue</button>
+        <button class="btn-ghost" onclick="goTo('page-tickets')">View my tickets</button>
+      </div>
+
+      <!-- REPORT -->
+      <div class="page" id="page-report">
+        <button class="back-btn" onclick="goTo('page-dashboard')">&#8592; Back</button>
+        <h2>New request</h2>
+        <div class="sub">Your details are auto-filled</div>
+        <label>Name <span class="auto-badge">auto</span></label>
+        <div class="field-static" id="r-name"></div>
+        <label>Location <span class="auto-badge">auto</span></label>
+        <div class="field-static" id="r-location"></div>
+        <label>Unit <span class="auto-badge">auto</span></label>
+        <div class="field-static" id="r-unit"></div>
+        <hr>
+        <label>Issue type</label>
+        <select id="issue-type">
+          <option value="">Select an issue...</option>
+          <option>Water leak</option>
+          <option>Electricity problem</option>
+          <option>AC not working</option>
+          <option>Broken door / window</option>
+          <option>Plumbing issue</option>
+          <option>Elevator issue</option>
+          <option>Pest / insects</option>
+          <option>Sewage / flooding</option>
+          <option>Fire or safety hazard</option>
+          <option>Gas leak</option>
+          <option>Broken window / latch</option>
+          <option>Other</option>
+        </select>
+        <label>Describe the problem</label>
+        <textarea id="issue-desc" placeholder="Briefly describe what's happening..."></textarea>
+        <button class="btn-primary" style="margin-top:16px" onclick="submitTicket()">Submit request</button>
+      </div>
+
+      <!-- CONFIRMATION -->
+      <div class="page" id="page-confirm">
+        <div class="confirm-center">
+          <div class="confirm-icon">
+            <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+              <path d="M5 13.5L10.5 19L21 8" stroke="#3B6D11" stroke-width="2.5" stroke-linecap="round"
+                stroke-linejoin="round" />
+            </svg>
+          </div>
+          <h2>Request submitted!</h2>
+          <div class="ticket-id" id="ticket-num"></div>
+          <div class="dept-pill">Assigned to Maintenance</div>
+          <div class="info-card" style="text-align:left">
+            <div class="info-row"><span class="info-key">Issue</span><span class="info-val" id="conf-issue"></span>
+            </div>
+            <div class="info-row"><span class="info-key">Location</span><span class="info-val"
+                id="conf-location"></span></div>
+            <div class="info-row"><span class="info-key">Unit</span><span class="info-val" id="conf-unit"></span></div>
+            <div class="info-row"><span class="info-key">Status</span><span class="info-val"
+                style="color:#BA7517">Open</span></div>
+            <div class="info-row"><span class="info-key">Submitted</span><span class="info-val" id="conf-time"></span>
+            </div>
+          </div>
+          <div class="confirm-note">The maintenance team has been notified and will be in touch shortly.</div>
+          <button class="btn-primary" onclick="goTo('page-tickets')">View my tickets</button>
+          <button class="btn-ghost" onclick="goTo('page-dashboard')">Back to home</button>
+        </div>
+      </div>
+
+      <!-- MY TICKETS -->
+      <div class="page" id="page-tickets">
+        <button class="back-btn" onclick="goTo('page-dashboard')">&#8592; Back</button>
+        <h2>My requests</h2>
+        <div class="sub" style="margin-bottom:16px">Track your reported issues</div>
+        <div id="tickets-list"></div>
+      </div>
+
+      <!-- ADMIN LOGIN -->
+      <div class="page" id="page-admin-login">
+        <div style="padding-top:20px">
+          <button class="back-btn" onclick="goTo('page-login')">&#8592; Back</button>
+          <h2>Admin portal</h2>
+          <div class="sub">Sign in with your admin credentials</div>
+          <label>Username</label>
+          <input type="text" id="admin-user" placeholder="admin" />
+          <label>Password</label>
+          <input type="password" id="admin-pass" placeholder="••••••••" />
+          <div class="error" id="admin-error">Wrong credentials. Try: admin / admin123</div>
+          <button class="btn-primary" style="margin-top:20px" onclick="doAdminLogin()">Sign in as admin</button>
+          <div style="font-size:12px;color:#aaa;text-align:center;margin-top:8px">Demo: admin / admin123</div>
+        </div>
+      </div>
+
+      <!-- ADMIN DASHBOARD -->
+      <div class="page" id="page-admin">
+        <h2>Admin portal</h2>
+        <div class="sub">All tickets — live overview</div>
+
+        <!-- Stats row (always visible) -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-num" id="stat-total">0</div>
+            <div class="stat-label">Total</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-open">0</div>
+            <div class="stat-label">Open</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-progress">0</div>
+            <div class="stat-label">In progress</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num" id="stat-resolved">0</div>
+            <div class="stat-label">Resolved</div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs">
+          <button class="admin-tab active" id="tab-dashboard" onclick="switchAdminTab('dashboard')">📊
+            Dashboard</button>
+          <button class="admin-tab" id="tab-tickets" onclick="switchAdminTab('tickets')">🎫 Tickets</button>
+        </div>
+
+        <!-- DASHBOARD TAB -->
+        <div id="admin-tab-dashboard">
+
+          <!-- Urgency breakdown -->
+          <div class="dash-card" style="margin-bottom:12px">
+            <div class="dash-card-title">URGENCY BREAKDOWN</div>
+            <div class="urgency-bar-row">
+              <span class="urgency-bar-label" style="color:#A32D2D">Critical</span>
+              <div class="urgency-bar-track">
+                <div class="urgency-bar-fill" id="bar-critical" style="background:#E24B4A;width:0%"></div>
+              </div>
+              <span class="urgency-bar-count" id="cnt-critical">0</span>
+            </div>
+            <div class="urgency-bar-row">
+              <span class="urgency-bar-label" style="color:#633806">High</span>
+              <div class="urgency-bar-track">
+                <div class="urgency-bar-fill" id="bar-high" style="background:#EF9F27;width:0%"></div>
+              </div>
+              <span class="urgency-bar-count" id="cnt-high">0</span>
+            </div>
+            <div class="urgency-bar-row">
+              <span class="urgency-bar-label" style="color:#0C447C">Medium</span>
+              <div class="urgency-bar-track">
+                <div class="urgency-bar-fill" id="bar-medium" style="background:#378ADD;width:0%"></div>
+              </div>
+              <span class="urgency-bar-count" id="cnt-medium">0</span>
+            </div>
+            <div class="urgency-bar-row">
+              <span class="urgency-bar-label" style="color:#3B6D11">Low</span>
+              <div class="urgency-bar-track">
+                <div class="urgency-bar-fill" id="bar-low" style="background:#639922;width:0%"></div>
+              </div>
+              <span class="urgency-bar-count" id="cnt-low">0</span>
+            </div>
+          </div>
+
+          <!-- Building heatmap -->
+          <div class="dash-card" style="margin-bottom:12px">
+            <div class="dash-card-title">BUILDING HEATMAP — ticket load &amp; urgency spread</div>
+            <div id="building-heatmap">
+              <p class="no-tickets">No tickets yet.</p>
+            </div>
+          </div>
+
+          <!-- Suggestions -->
+          <div style="margin-bottom:12px">
+            <div style="font-size:11px;color:#aaa;letter-spacing:0.03em;margin-bottom:8px">SMART SUGGESTIONS</div>
+            <div id="suggestions-panel">
+              <p class="no-tickets">Submit tickets to see suggestions.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TICKETS TAB -->
+        <div id="admin-tab-tickets" style="display:none">
+          <input class="search-box" type="text" id="admin-search" placeholder="Search by tenant, building, or issue..."
+            oninput="renderAdminTickets()" />
+          <div id="admin-tickets-list"></div>
+        </div>
+
+        <button class="btn-ghost" style="margin-top:8px" onclick="adminLogout()">Sign out of admin</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const TENANTS = [
+      { name: 'John Smith', email: 'john.smith@tenantdesk.com', location: 'Bunyan Towers, Mazgaon, Maharashtra', wing: 'A', flat: '101', contact: '+91 9876500011' },
+      { name: 'Ali Khan', email: 'ali.khan@tenantdesk.com', location: 'Sea View Apartments, Colaba, Maharashtra', wing: 'A', flat: '102', contact: '+91 9876500012' },
+      { name: 'Rohan Mehta', email: 'rohan.mehta@tenantdesk.com', location: 'Green Residency, Andheri, Maharashtra', wing: 'A', flat: '103', contact: '+91 9876500013' },
+      { name: 'Sara Sheikh', email: 'sara.sheikh@tenantdesk.com', location: 'Lakeview Heights, Powai, Maharashtra', wing: 'A', flat: '104', contact: '+91 9876500014' },
+      { name: 'David Joseph', email: 'david.joseph@tenantdesk.com', location: 'Palm Grove, Bandra, Maharashtra', wing: 'A', flat: '105', contact: '+91 9876500015' },
+      { name: 'Imran Shaikh', email: 'imran.shaikh@tenantdesk.com', location: 'Hill Crest, Thane, Maharashtra', wing: 'A', flat: '106', contact: '+91 9876500016' },
+      { name: 'Neha Patel', email: 'neha.patel@tenantdesk.com', location: 'Shanti Towers, Vashi, Maharashtra', wing: 'A', flat: '107', contact: '+91 9876500017' },
+      { name: 'Arjun Nair', email: 'arjun.nair@tenantdesk.com', location: 'Sunrise Enclave, Kochi, Kerala', wing: 'A', flat: '108', contact: '+91 9876500018' },
+      { name: 'Fatima Noor', email: 'fatima.noor@tenantdesk.com', location: 'Royal Residency, Hyderabad, Telangana', wing: 'A', flat: '109', contact: '+91 9876500019' },
+      { name: 'Sameer Desai', email: 'sameer.desai@tenantdesk.com', location: 'Lotus Apartments, Ahmedabad, Gujarat', wing: 'A', flat: '110', contact: '+91 9876500020' },
+      { name: 'Karan Shah', email: 'karan.shah@tenantdesk.com', location: 'Silver Oak, Surat, Gujarat', wing: 'B', flat: '111', contact: '+91 9876500021' },
+      { name: 'Zoya Ansari', email: 'zoya.ansari@tenantdesk.com', location: 'Pearl Heights, Bhopal, Madhya Pradesh', wing: 'B', flat: '112', contact: '+91 9876500022' },
+      { name: 'Rahul Verma', email: 'rahul.verma@tenantdesk.com', location: 'Green Valley, Delhi', wing: 'B', flat: '113', contact: '+91 9876500023' },
+      { name: 'Ayesha Khan', email: 'ayesha.khan@tenantdesk.com', location: 'Sky Residency, Noida, Uttar Pradesh', wing: 'B', flat: '114', contact: '+91 9876500024' },
+      { name: 'Vikram Singh', email: 'vikram.singh@tenantdesk.com', location: 'Royal Heights, Jaipur, Rajasthan', wing: 'B', flat: '115', contact: '+91 9876500025' },
+      { name: 'Pooja Iyer', email: 'pooja.iyer@tenantdesk.com', location: 'Temple View, Chennai, Tamil Nadu', wing: 'B', flat: '116', contact: '+91 9876500026' },
+      { name: 'Nikhil Jain', email: 'nikhil.jain@tenantdesk.com', location: 'Lake Palace Apartments, Udaipur, Rajasthan', wing: 'B', flat: '117', contact: '+91 9876500027' },
+      { name: 'Sana Malik', email: 'sana.malik@tenantdesk.com', location: 'Metro Towers, Lucknow, Uttar Pradesh', wing: 'B', flat: '118', contact: '+91 9876500028' },
+      { name: 'Aditya Rao', email: 'aditya.rao@tenantdesk.com', location: 'Tech Park Residency, Bengaluru, Karnataka', wing: 'B', flat: '119', contact: '+91 9876500029' },
+      { name: 'Farhan Ali', email: 'farhan.ali@tenantdesk.com', location: 'Garden Estate, Pune, Maharashtra', wing: 'B', flat: '120', contact: '+91 9876500030' },
+      { name: 'Meera Kapoor', email: 'meera.kapoor@tenantdesk.com', location: 'Harmony Homes, Chandigarh', wing: 'C', flat: '121', contact: '+91 9876500031' },
+      { name: 'Danish Sheikh', email: 'danish.sheikh@tenantdesk.com', location: 'Riverfront Residency, Ahmedabad, Gujarat', wing: 'C', flat: '122', contact: '+91 9876500032' },
+      { name: 'Rohit Agarwal', email: 'rohit.agarwal@tenantdesk.com', location: 'Skyline Towers, Kolkata, West Bengal', wing: 'C', flat: '123', contact: '+91 9876500033' },
+      { name: 'Amina Hussain', email: 'amina.hussain@tenantdesk.com', location: 'Emerald Heights, Indore, Madhya Pradesh', wing: 'C', flat: '124', contact: '+91 9876500034' },
+      { name: 'Kabir Khan', email: 'kabir.khan@tenantdesk.com', location: 'Crescent Apartments, Aligarh, Uttar Pradesh', wing: 'C', flat: '125', contact: '+91 9876500035' },
+      { name: 'Sneha Kulkarni', email: 'sneha.kulkarni@tenantdesk.com', location: 'Orchid Residency, Nagpur, Maharashtra', wing: 'C', flat: '126', contact: '+91 9876500036' },
+      { name: 'Yusuf Pathan', email: 'yusuf.pathan@tenantdesk.com', location: 'Sapphire Towers, Vadodara, Gujarat', wing: 'C', flat: '127', contact: '+91 9876500037' },
+      { name: 'Ritu Sharma', email: 'ritu.sharma@tenantdesk.com', location: 'Green Meadows, Dehradun, Uttarakhand', wing: 'C', flat: '128', contact: '+91 9876500038' },
+      { name: 'Faizan Siddiqui', email: 'faizan.siddiqui@tenantdesk.com', location: 'Central Residency, Patna, Bihar', wing: 'C', flat: '129', contact: '+91 9876500039' },
+      { name: 'Kunal Gupta', email: 'kunal.gupta@tenantdesk.com', location: 'Elite Enclave, Gurgaon, Haryana', wing: 'C', flat: '130', contact: '+91 9876500040' },
+      { name: 'Aditi Joshi', email: 'aditi.joshi@tenantdesk.com', location: 'Blue Hills, Shimla, Himachal Pradesh', wing: 'D', flat: '131', contact: '+91 9876500041' },
+      { name: 'Bilal Qureshi', email: 'bilal.qureshi@tenantdesk.com', location: 'Valley View, Srinagar, Jammu & Kashmir', wing: 'D', flat: '132', contact: '+91 9876500042' },
+      { name: 'Varun Malhotra', email: 'varun.malhotra@tenantdesk.com', location: 'Urban Nest, Ludhiana, Punjab', wing: 'D', flat: '133', contact: '+91 9876500043' },
+      { name: 'Noor Fatima', email: 'noor.fatima@tenantdesk.com', location: 'Lake City Homes, Bhopal, Madhya Pradesh', wing: 'D', flat: '134', contact: '+91 9876500044' },
+      { name: 'Manish Yadav', email: 'manish.yadav@tenantdesk.com', location: 'Royal Gardens, Kanpur, Uttar Pradesh', wing: 'D', flat: '135', contact: '+91 9876500045' },
+      { name: 'Shreya Bose', email: 'shreya.bose@tenantdesk.com', location: 'Eden Residency, Kolkata, West Bengal', wing: 'D', flat: '136', contact: '+91 9876500046' },
+      { name: 'Omar Farooq', email: 'omar.farooq@tenantdesk.com', location: 'Hill View Apartments, Guwahati, Assam', wing: 'D', flat: '137', contact: '+91 9876500047' },
+      { name: 'Anjali Singh', email: 'anjali.singh@tenantdesk.com', location: 'Lotus Valley, Ranchi, Jharkhand', wing: 'D', flat: '138', contact: '+91 9876500048' },
+      { name: 'Harsh Vora', email: 'harsh.vora@tenantdesk.com', location: 'Prime Residency, Rajkot, Gujarat', wing: 'D', flat: '139', contact: '+91 9876500049' },
+      { name: 'Zahra Abbas', email: 'zahra.abbas@tenantdesk.com', location: 'Crescent Homes, Aurangabad, Maharashtra', wing: 'D', flat: '140', contact: '+91 9876500050' },
+      { name: 'Dev Patel', email: 'dev.patel@tenantdesk.com', location: 'Green Park Towers, Surat, Gujarat', wing: 'E', flat: '141', contact: '+91 9876500051' },
+      { name: 'Hina Khan', email: 'hina.khan@tenantdesk.com', location: 'Rose Residency, Delhi', wing: 'E', flat: '142', contact: '+91 9876500052' },
+      { name: 'Amit Tiwari', email: 'amit.tiwari@tenantdesk.com', location: 'Shanti Enclave, Allahabad, Uttar Pradesh', wing: 'E', flat: '143', contact: '+91 9876500053' },
+      { name: 'Samira Ali', email: 'samira.ali@tenantdesk.com', location: 'Ocean View, Kochi, Kerala', wing: 'E', flat: '144', contact: '+91 9876500054' },
+      { name: 'Rajiv Menon', email: 'rajiv.menon@tenantdesk.com', location: 'Palm Residency, Trivandrum, Kerala', wing: 'E', flat: '145', contact: '+91 9876500055' },
+      { name: 'Nida Shaikh', email: 'nida.shaikh@tenantdesk.com', location: 'Metro Heights, Hyderabad, Telangana', wing: 'E', flat: '146', contact: '+91 9876500056' },
+      { name: 'Gaurav Bansal', email: 'gaurav.bansal@tenantdesk.com', location: 'City Square Apartments, Jaipur, Rajasthan', wing: 'E', flat: '147', contact: '+91 9876500057' },
+      { name: 'Iqra Khan', email: 'iqra.khan@tenantdesk.com', location: 'Sunrise Towers, Bhopal, Madhya Pradesh', wing: 'E', flat: '148', contact: '+91 9876500058' },
+      { name: 'Sandeep Mishra', email: 'sandeep.mishra@tenantdesk.com', location: 'Elite Residency, Varanasi, Uttar Pradesh', wing: 'E', flat: '149', contact: '+91 9876500059' },
+      { name: 'Mariam Sheikh', email: 'mariam.sheikh@tenantdesk.com', location: 'Harmony Heights, Pune, Maharashtra', wing: 'E', flat: '150', contact: '+91 9876500060' },
+      { name: 'Pranav Kulkarni', email: 'pranav.kulkarni@tenantdesk.com', location: 'Orchid Towers, Mumbai, Maharashtra', wing: 'F', flat: '151', contact: '+91 9876500061' },
+      { name: 'Ayaan Khan', email: 'ayaan.khan@tenantdesk.com', location: 'Royal Enclave, Delhi', wing: 'F', flat: '152', contact: '+91 9876500062' },
+      { name: 'Rakesh Sharma', email: 'rakesh.sharma@tenantdesk.com', location: 'Green Heights, Noida, Uttar Pradesh', wing: 'F', flat: '153', contact: '+91 9876500063' },
+      { name: 'Zainab Ali', email: 'zainab.ali@tenantdesk.com', location: 'Pearl Residency, Hyderabad, Telangana', wing: 'F', flat: '154', contact: '+91 9876500064' },
+      { name: 'Deepak Verma', email: 'deepak.verma@tenantdesk.com', location: 'Skyline Apartments, Bengaluru, Karnataka', wing: 'F', flat: '155', contact: '+91 9876500065' },
+      { name: 'Saba Siddiqui', email: 'saba.siddiqui@tenantdesk.com', location: 'Lake View Homes, Udaipur, Rajasthan', wing: 'F', flat: '156', contact: '+91 9876500066' },
+      { name: 'Ankit Jain', email: 'ankit.jain@tenantdesk.com', location: 'Urban Heights, Indore, Madhya Pradesh', wing: 'F', flat: '157', contact: '+91 9876500067' },
+      { name: 'Farah Khan', email: 'farah.khan@tenantdesk.com', location: 'Garden View Residency, Lucknow, Uttar Pradesh', wing: 'F', flat: '158', contact: '+91 9876500068' },
+      { name: 'Nitin Gupta', email: 'nitin.gupta@tenantdesk.com', location: 'Metro Enclave, Gurgaon, Haryana', wing: 'F', flat: '159', contact: '+91 9876500069' },
+      { name: 'Hammad Ali', email: 'hammad.ali@tenantdesk.com', location: 'Central Towers, Patna, Bihar', wing: 'F', flat: '160', contact: '+91 9876500070' },
+      { name: 'Chirag Shah', email: 'chirag.shah@tenantdesk.com', location: 'Silver Residency, Ahmedabad, Gujarat', wing: 'G', flat: '161', contact: '+91 9876500071' },
+      { name: 'Mahira Khan', email: 'mahira.khan@tenantdesk.com', location: 'Blue Sky Apartments, Chennai, Tamil Nadu', wing: 'G', flat: '162', contact: '+91 9876500072' },
+      { name: 'Abhishek Singh', email: 'abhishek.singh@tenantdesk.com', location: 'Sunrise Homes, Kanpur, Uttar Pradesh', wing: 'G', flat: '163', contact: '+91 9876500073' },
+      { name: 'Sana Sheikh', email: 'sana.sheikh@tenantdesk.com', location: 'Hill Crest Towers, Shimla, Himachal Pradesh', wing: 'G', flat: '164', contact: '+91 9876500074' },
+      { name: 'Yash Agarwal', email: 'yash.agarwal@tenantdesk.com', location: 'Royal Plaza, Jaipur, Rajasthan', wing: 'G', flat: '165', contact: '+91 9876500075' },
+      { name: 'Iram Fatima', email: 'iram.fatima@tenantdesk.com', location: 'Crescent Residency, Aligarh, Uttar Pradesh', wing: 'G', flat: '166', contact: '+91 9876500076' },
+      { name: 'Tarun Mehta', email: 'tarun.mehta@tenantdesk.com', location: 'Green Valley Homes, Dehradun, Uttarakhand', wing: 'G', flat: '167', contact: '+91 9876500077' },
+      { name: 'Hafsa Khan', email: 'hafsa.khan@tenantdesk.com', location: 'Palm Heights, Kochi, Kerala', wing: 'G', flat: '168', contact: '+91 9876500078' },
+      { name: 'Keshav Nair', email: 'keshav.nair@tenantdesk.com', location: 'Tech Residency, Bengaluru, Karnataka', wing: 'G', flat: '169', contact: '+91 9876500079' },
+      { name: 'Uzma Sheikh', email: 'uzma.sheikh@tenantdesk.com', location: 'Harmony Enclave, Pune, Maharashtra', wing: 'G', flat: '170', contact: '+91 9876500080' },
+      { name: 'Rohan Das', email: 'rohan.das@tenantdesk.com', location: 'Lake View Residency, Kolkata, West Bengal', wing: 'H', flat: '171', contact: '+91 9876500081' },
+      { name: 'Aaliya Khan', email: 'aaliya.khan@tenantdesk.com', location: 'Pearl Towers, Hyderabad, Telangana', wing: 'H', flat: '172', contact: '+91 9876500082' },
+      { name: 'Mohit Sharma', email: 'mohit.sharma@tenantdesk.com', location: 'Green Residency, Delhi', wing: 'H', flat: '173', contact: '+91 9876500083' },
+      { name: 'Nargis Ali', email: 'nargis.ali@tenantdesk.com', location: 'Royal Heights, Mumbai, Maharashtra', wing: 'H', flat: '174', contact: '+91 9876500084' },
+      { name: 'Saurabh Gupta', email: 'saurabh.gupta@tenantdesk.com', location: 'Skyline Homes, Noida, Uttar Pradesh', wing: 'H', flat: '175', contact: '+91 9876500085' },
+      { name: 'Rabia Siddiqui', email: 'rabia.siddiqui@tenantdesk.com', location: 'Urban Nest, Lucknow, Uttar Pradesh', wing: 'H', flat: '176', contact: '+91 9876500086' },
+      { name: 'Vivek Mishra', email: 'vivek.mishra@tenantdesk.com', location: 'Central Residency, Patna, Bihar', wing: 'H', flat: '177', contact: '+91 9876500087' },
+      { name: 'Alina Khan', email: 'alina.khan@tenantdesk.com', location: 'Garden Towers, Surat, Gujarat', wing: 'H', flat: '178', contact: '+91 9876500088' },
+      { name: 'Pankaj Yadav', email: 'pankaj.yadav@tenantdesk.com', location: 'Elite Apartments, Indore, Madhya Pradesh', wing: 'H', flat: '179', contact: '+91 9876500089' },
+      { name: 'Saira Noor', email: 'saira.noor@tenantdesk.com', location: 'Sunrise Enclave, Kochi, Kerala', wing: 'H', flat: '180', contact: '+91 9876500090' }
+    ];
+
+    let currentUser = null;
+    let isAdminLoggedIn = false;
+    let allTickets = [];
+    let ticketCounter = 100;
+
+    /* ── Helper: sanitize strings to prevent XSS when using innerHTML ── */
+    function escapeHTML(str) {
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+    }
+    function getUrgency(type) {
+      const critical = ['Water leak', 'Sewage / flooding', 'Fire or safety hazard', 'Gas leak'];
+      const high = ['Electricity problem', 'Elevator issue', 'Broken door / window', 'Pest / insects'];
+      const medium = ['AC not working', 'Plumbing issue', 'Broken window / latch'];
+      if (critical.includes(type)) return 'critical';
+      if (high.includes(type)) return 'high';
+      if (medium.includes(type)) return 'medium';
+      return 'low';
+    }
+
+
+
+    function goTo(p) {
+      document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+      document.getElementById(p).classList.add('active');
+      if (p === 'page-tickets') renderMyTickets();
+      if (p === 'page-admin') renderAdmin();
+      if (p === 'page-dashboard') renderDashboard();
+      if (p === 'page-report') renderReportPrefill();
+    }
+
+    function doLogin() {
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      const pass = document.getElementById('login-pass').value.trim();
+      const err = document.getElementById('login-error');
+      const user = TENANTS.find(t => t.email === email);
+      if (user && pass === '1234') {
+        currentUser = JSON.parse(JSON.stringify(user));
+        currentUser.edited = false;
+        currentUser.changeLog = [];
+        err.style.display = 'none';
+        const initials = user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('nav-avatar').style.display = 'flex';
+        document.getElementById('nav-avatar').textContent = initials;
+        document.getElementById('nav-sub').textContent = user.location;
+        document.getElementById('admin-nav-btn').style.display = 'none';
+        goTo('page-dashboard');
+      } else {
+        err.style.display = 'block';
+      }
+    }
+
+    function renderDashboard() {
+      if (!currentUser) return;
+      const h = new Date().getHours();
+      const g = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+      document.getElementById('dash-greeting').textContent = g + ', ' + currentUser.name.split(' ')[0];
+      document.getElementById('dash-sub').textContent = currentUser.location + ' — Wing ' + currentUser.wing + ', Flat ' + currentUser.flat;
+      document.getElementById('d-name').textContent = currentUser.name;
+      document.getElementById('d-location-display').textContent = currentUser.location;
+      document.getElementById('d-wing-display').textContent = currentUser.wing;
+      document.getElementById('d-flat-display').textContent = currentUser.flat;
+      document.getElementById('d-contact').textContent = currentUser.contact;
+      const badge = document.getElementById('auto-badge-lbl');
+      if (currentUser.edited) {
+        badge.className = 'edited-badge';
+        badge.textContent = 'edited by tenant';
+      } else {
+        badge.className = 'auto-badge';
+        badge.textContent = 'auto-filled';
+      }
+      const log = document.getElementById('change-log');
+      if (currentUser.changeLog && currentUser.changeLog.length > 0) {
+        log.style.display = 'block';
+        log.innerHTML = '<strong>Edit history:</strong><br>' + currentUser.changeLog.join('<br>');
+      } else {
+        log.style.display = 'none';
+      }
+    }
+
+    function renderReportPrefill() {
+      if (!currentUser) return;
+      document.getElementById('r-name').textContent = currentUser.name;
+      document.getElementById('r-location').textContent = currentUser.location;
+      document.getElementById('r-unit').textContent = 'Wing ' + currentUser.wing + ', Flat ' + currentUser.flat;
+    }
+
+    function toggleEdit() {
+      const fields = ['location', 'wing', 'flat'];
+      const isEditing = document.getElementById('d-location-input').style.display !== 'none';
+      if (isEditing) { cancelEdit(); return; }
+      fields.forEach(f => {
+        document.getElementById('d-' + f + '-display').style.display = 'none';
+        const inp = document.getElementById('d-' + f + '-input');
+        inp.style.display = '';
+        inp.value = currentUser[f];
+      });
+      document.getElementById('edit-actions').style.display = 'flex';
+      document.getElementById('edit-toggle-btn').textContent = 'Cancel';
+    }
+
+    function saveEdit() {
+      const fields = ['location', 'wing', 'flat'];
+      const changes = [];
+      fields.forEach(f => {
+        const newVal = document.getElementById('d-' + f + '-input').value.trim();
+        if (newVal && newVal !== currentUser[f]) {
+          changes.push(f.charAt(0).toUpperCase() + f.slice(1) + ': "' + currentUser[f] + '" to "' + newVal + '"');
+          currentUser[f] = newVal;
+          currentUser.edited = true;
+        }
+      });
+      if (changes.length > 0) {
+        const now = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        currentUser.changeLog.push('[' + now + '] ' + changes.join(', '));
+      }
+      fields.forEach(f => {
+        document.getElementById('d-' + f + '-display').style.display = '';
+        document.getElementById('d-' + f + '-input').style.display = 'none';
+      });
+      document.getElementById('edit-actions').style.display = 'none';
+      document.getElementById('edit-toggle-btn').textContent = 'Edit details';
+      renderDashboard();
+    }
+
+    function cancelEdit() {
+      const fields = ['location', 'wing', 'flat'];
+      fields.forEach(f => {
+        document.getElementById('d-' + f + '-display').style.display = '';
+        document.getElementById('d-' + f + '-input').style.display = 'none';
+      });
+      document.getElementById('edit-actions').style.display = 'none';
+      document.getElementById('edit-toggle-btn').textContent = 'Edit details';
+    }
+
+    function submitTicket() {
+      const type = document.getElementById('issue-type').value;
+      const desc = document.getElementById('issue-desc').value.trim();
+      if (!type) { alert('Please select an issue type.'); return; }
+      if (!desc) { alert('Please describe the problem.'); return; }
+      ticketCounter++;
+      const id = 'TK-' + String(ticketCounter).padStart(5, '0');
+      const now = new Date();
+      const timeStr = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ' at ' + now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      allTickets.unshift({
+        id, type, desc, status: 'open', time: timeStr,
+        tenant: currentUser.name, email: currentUser.email,
+        location: currentUser.location, wing: currentUser.wing,
+        flat: currentUser.flat, contact: currentUser.contact,
+        locationEdited: currentUser.edited || false,
+        urgency: getUrgency(type),
+        urgencyOverridden: false
+      });
+      document.getElementById('ticket-num').textContent = id;
+      document.getElementById('conf-issue').textContent = type;
+      document.getElementById('conf-location').textContent = currentUser.location;
+      document.getElementById('conf-unit').textContent = 'Wing ' + currentUser.wing + ', Flat ' + currentUser.flat;
+      document.getElementById('conf-time').textContent = timeStr;
+      document.getElementById('issue-type').value = '';
+      document.getElementById('issue-desc').value = '';
+      goTo('page-confirm');
+    }
+
+    function renderMyTickets() {
+      if (!currentUser) return;
+      const list = document.getElementById('tickets-list');
+      const mine = allTickets.filter(tk => tk.email === currentUser.email);
+      if (!mine.length) { list.innerHTML = '<p style="color:#aaa;text-align:center;padding:30px 0;font-size:13px">No tickets yet.</p>'; return; }
+      list.innerHTML = mine.map(tk => {
+        const dot = tk.status === 'open' ? '#E24B4A' : tk.status === 'progress' ? '#378ADD' : '#639922';
+        const cls = tk.status === 'open' ? 'b-open' : tk.status === 'progress' ? 'b-progress' : 'b-resolved';
+        const lbl = tk.status === 'open' ? 'Open' : tk.status === 'progress' ? 'In progress' : 'Resolved';
+        return '<div class="ticket-row"><div class="t-dot" style="background:' + dot + '"></div><div class="t-info"><div class="t-title">' + escapeHTML(tk.type) + '</div><div class="t-sub">' + tk.id + ' &middot; ' + tk.time + '</div></div><div class="t-badge ' + cls + '">' + lbl + '</div></div>';
+      }).join('');
+    }
+
+    function doAdminLogin() {
+      const u = document.getElementById('admin-user').value.trim();
+      const p = document.getElementById('admin-pass').value.trim();
+      const err = document.getElementById('admin-error');
+      if (u === 'admin' && p === 'admin123') {
+        isAdminLoggedIn = true;
+        err.style.display = 'none';
+        document.getElementById('nav-sub').textContent = 'Admin View';
+        document.getElementById('nav-avatar').style.display = 'none';
+        document.getElementById('admin-nav-btn').style.display = 'none';
+        goTo('page-admin');
+      } else {
+        err.style.display = 'block';
+      }
+    }
+
+    /* ── PATCH 3: Admin tab switcher ── */
+    function switchAdminTab(tab) {
+      document.getElementById('admin-tab-dashboard').style.display = tab === 'dashboard' ? '' : 'none';
+      document.getElementById('admin-tab-tickets').style.display = tab === 'tickets' ? '' : 'none';
+      document.getElementById('tab-dashboard').classList.toggle('active', tab === 'dashboard');
+      document.getElementById('tab-tickets').classList.toggle('active', tab === 'tickets');
+      if (tab === 'tickets') renderAdminTickets();
+      if (tab === 'dashboard') renderAdminDashboard();
+    }
+
+    /* ── PATCH 3: Main renderAdmin — called when page loads ── */
+    function renderAdmin() {
+      // Update stats bar (always)
+      document.getElementById('stat-total').textContent = allTickets.length;
+      document.getElementById('stat-open').textContent = allTickets.filter(t => t.status === 'open').length;
+      document.getElementById('stat-progress').textContent = allTickets.filter(t => t.status === 'progress').length;
+      document.getElementById('stat-resolved').textContent = allTickets.filter(t => t.status === 'resolved').length;
+      // Reset to dashboard tab on first load
+      switchAdminTab('dashboard');
+    }
+
+    /* ── PATCH 3: Dashboard tab — urgency bars + heatmap + suggestions ── */
+    function renderAdminDashboard() {
+      const open = allTickets.filter(t => t.status !== 'resolved');
+
+      // Urgency counts (only non-resolved tickets count toward active urgency)
+      const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+      open.forEach(t => { if (counts[t.urgency] !== undefined) counts[t.urgency]++; });
+      const maxCount = Math.max(...Object.values(counts), 1);
+
+      ['critical', 'high', 'medium', 'low'].forEach(u => {
+        document.getElementById('cnt-' + u).textContent = counts[u];
+        document.getElementById('bar-' + u).style.width = Math.round((counts[u] / maxCount) * 100) + '%';
+      });
+
+      // Building heatmap — sorted by total ticket count desc
+      const byBuilding = {};
+      allTickets.forEach(tk => {
+        const bld = tk.location.split(',')[0].trim();
+        if (!byBuilding[bld]) byBuilding[bld] = { total: 0, critical: 0, high: 0, medium: 0, low: 0 };
+        byBuilding[bld].total++;
+        if (byBuilding[bld][tk.urgency] !== undefined) byBuilding[bld][tk.urgency]++;
+      });
+      const heatmap = document.getElementById('building-heatmap');
+      const sortedBuildings = Object.entries(byBuilding).sort((x, y) => y[1].total - x[1].total);
+      if (!sortedBuildings.length) { heatmap.innerHTML = '<p class="no-tickets">No tickets yet.</p>'; }
+      else {
+        const maxTotal = sortedBuildings[0][1].total;
+        heatmap.innerHTML = sortedBuildings.map(([name, d]) => {
+          // Generate coloured dots: one dot per ticket (cap at 10 for display)
+          const dotArr = [];
+          const dotColors = { critical: '#E24B4A', high: '#EF9F27', medium: '#378ADD', low: '#639922' };
+          ['critical', 'high', 'medium', 'low'].forEach(u => {
+            for (let i = 0; i < Math.min(d[u], 4); i++) dotArr.push(dotColors[u]);
+          });
+          const dots = dotArr.slice(0, 10).map(c => '<span class="building-dot" style="background:' + c + '"></span>').join('');
+          return '<div class="building-row">' +
+            '<span class="building-name">' + escapeHTML(name) + '</span>' +
+            '<div class="building-dots">' + dots + '</div>' +
+            '<span class="building-count">' + d.total + '</span>' +
+            '</div>';
+        }).join('');
+      }
+
+      // Smart suggestions based on patterns
+      const suggestions = [];
+      if (counts.critical >= 2) suggestions.push({ title: '⚠️ Multiple critical issues active', desc: counts.critical + ' critical tickets (water leak, gas leak, etc.) are unresolved. Consider dispatching maintenance urgently.' });
+      const topBuilding = Object.entries(byBuilding).sort((a, b) => b[1].total - a[1].total)[0];
+      if (topBuilding && topBuilding[1].total >= 3) suggestions.push({ title: '🏢 High load: ' + topBuilding[0], desc: topBuilding[0] + ' has ' + topBuilding[1].total + ' tickets. Consider assigning a dedicated maintenance worker.' });
+      const acCount = allTickets.filter(t => t.type === 'AC not working').length;
+      if (acCount >= 2) suggestions.push({ title: '❄️ AC issues clustering', desc: acCount + ' AC tickets filed. Could indicate a shared HVAC fault — worth investigating centrally.' });
+      const pestCount = allTickets.filter(t => t.type === 'Pest / insects').length;
+      if (pestCount >= 2) suggestions.push({ title: '🐛 Pest reports detected', desc: pestCount + ' pest tickets. Recommend a building-wide pest control inspection.' });
+      if (!suggestions.length && allTickets.length > 0) suggestions.push({ title: '✅ All looks healthy', desc: 'No unusual patterns detected. Keep an eye on new tickets as they come in.' });
+
+      const panel = document.getElementById('suggestions-panel');
+      if (!allTickets.length) { panel.innerHTML = '<p class="no-tickets">Submit tickets to see suggestions.</p>'; }
+      else {
+        panel.innerHTML = suggestions.map(s =>
+          '<div class="suggestion-card"><div class="suggestion-title">' + s.title + '</div><div class="suggestion-desc">' + s.desc + '</div></div>'
+        ).join('');
+      }
+    }
+
+    /* ── PATCH 3: Tickets tab — grouped by building with urgency badges + override ── */
+    function renderAdminTickets() {
+      const search = (document.getElementById('admin-search').value || '').toLowerCase();
+      const filtered = allTickets.filter(tk =>
+        !search || tk.tenant.toLowerCase().includes(search) ||
+        tk.location.toLowerCase().includes(search) || tk.type.toLowerCase().includes(search)
+      );
+      const byBuilding = {};
+      filtered.forEach(tk => {
+        const bld = tk.location.split(',')[0].trim();
+        if (!byBuilding[bld]) byBuilding[bld] = [];
+        byBuilding[bld].push(tk);
+      });
+      const container = document.getElementById('admin-tickets-list');
+      if (!filtered.length) { container.innerHTML = '<div class="no-tickets">No tickets found.</div>'; return; }
+      const urgOrder = { critical: 0, high: 1, medium: 2, low: 3 };
+      container.innerHTML = Object.keys(byBuilding).map(bldName => {
+        const tks = byBuilding[bldName];
+        // Sort by urgency: critical first
+        tks.sort((x, y) => urgOrder[x.urgency] - urgOrder[y.urgency]);
+        const rows = tks.map(tk => {
+          const editedNote = tk.locationEdited ? ' <span style="font-size:10px;background:#FAEEDA;color:#633806;padding:1px 6px;border-radius:4px">location edited by tenant</span>' : '';
+          const urgClass = 'urgency-' + tk.urgency;
+          const badgeClass = 'badge-' + tk.urgency;
+          const urgLabel = tk.urgency.charAt(0).toUpperCase() + tk.urgency.slice(1);
+          const overrideTag = tk.urgencyOverridden ? '<span class="override-tag">manually set</span>' : '';
+          return '<div class="admin-ticket ' + urgClass + '">' +
+            '<div class="admin-ticket-top">' +
+            '<div><div class="admin-ticket-id">' + tk.id + ' &middot; ' + tk.time + '</div>' +
+            '<div class="admin-ticket-type">' + escapeHTML(tk.type) + '</div></div>' +
+            '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">' +
+            '<select class="admin-status-select" onchange="updateStatus(\'' + tk.id + '\',this.value)">' +
+            '<option value="open"' + (tk.status === 'open' ? ' selected' : '') + '>Open</option>' +
+            '<option value="progress"' + (tk.status === 'progress' ? ' selected' : '') + '>In progress</option>' +
+            '<option value="resolved"' + (tk.status === 'resolved' ? ' selected' : '') + '>Resolved</option>' +
+            '</select>' +
+            '<div style="display:flex;align-items:center;gap:4px">' +
+            '<span class="urgency-badge ' + badgeClass + '">' + urgLabel + '</span>' + overrideTag +
+            '<select class="admin-status-select" style="font-size:10px;padding:2px 5px" onchange="overrideUrgency(\'' + tk.id + '\',this.value)">' +
+            '<option value="">Override…</option>' +
+            ['critical', 'high', 'medium', 'low'].map(u => '<option value="' + u + '"' + (tk.urgency === u && tk.urgencyOverridden ? ' selected' : '') + '>' + u.charAt(0).toUpperCase() + u.slice(1) + '</option>').join('') +
+            '</select>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="admin-ticket-detail"><strong>Tenant:</strong> ' + escapeHTML(tk.tenant) + ' &nbsp;|&nbsp; <strong>Contact:</strong> ' + escapeHTML(tk.contact) + '</div>' +
+            '<div class="admin-ticket-detail"><strong>Location:</strong> ' + escapeHTML(tk.location) + editedNote + '</div>' +
+            '<div class="admin-ticket-detail"><strong>Wing:</strong> ' + escapeHTML(tk.wing) + ' &nbsp;|&nbsp; <strong>Flat:</strong> ' + escapeHTML(tk.flat) + '</div>' +
+            '<div class="admin-ticket-detail" style="color:#888;font-style:italic;margin-top:4px">' + escapeHTML(tk.desc) + '</div>' +
+            '</div>';
+        }).join('');
+        return '<div class="admin-section"><div class="admin-building-header"><span>' + escapeHTML(bldName) + '</span><span style="font-size:11px;opacity:0.8">' + tks.length + ' ticket' + (tks.length > 1 ? 's' : '') + '</span></div>' + rows + '</div>';
+      }).join('');
+    }
+
+    function updateStatus(id, newStatus) {
+      const ticket = allTickets.find(tk => tk.id === id);
+      if (ticket) {
+        ticket.status = newStatus;
+        renderAdminTickets();
+        renderAdminDashboard();
+        document.getElementById('stat-total').textContent = allTickets.length;
+        document.getElementById('stat-open').textContent = allTickets.filter(tk => tk.status === 'open').length;
+        document.getElementById('stat-progress').textContent = allTickets.filter(tk => tk.status === 'progress').length;
+        document.getElementById('stat-resolved').textContent = allTickets.filter(tk => tk.status === 'resolved').length;
+      }
+    }
+
+    /* ── PATCH 3: Admin urgency override ── */
+    function overrideUrgency(id, newUrgency) {
+      if (!newUrgency) return;
+      const ticket = allTickets.find(tk => tk.id === id);
+      if (ticket) { ticket.urgency = newUrgency; ticket.urgencyOverridden = true; renderAdminTickets(); renderAdminDashboard(); }
+    }
+
+    function adminLogout() {
+      isAdminLoggedIn = false;
+      document.getElementById('admin-user').value = '';
+      document.getElementById('admin-pass').value = '';
+      document.getElementById('admin-error').style.display = 'none';
+      document.getElementById('nav-sub').textContent = 'Maintenance Portal';
+      document.getElementById('admin-nav-btn').style.display = '';
+      // If a tenant was logged in before, restore their session
+      if (currentUser) {
+        const initials = currentUser.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('nav-avatar').style.display = 'flex';
+        document.getElementById('nav-avatar').textContent = initials;
+        document.getElementById('nav-sub').textContent = currentUser.location;
+        document.getElementById('admin-nav-btn').style.display = 'none';
+        goTo('page-dashboard');
+      } else {
+        goTo('page-login');
+      }
+    }
+
+    function logout() {
+      currentUser = null;
+      document.getElementById('nav-avatar').style.display = 'none';
+      document.getElementById('nav-avatar').textContent = '--';
+      document.getElementById('admin-nav-btn').style.display = '';
+      document.getElementById('nav-sub').textContent = 'Maintenance Portal';
+      // Clear login form fields and error state
+      document.getElementById('login-email').value = '';
+      document.getElementById('login-pass').value = '';
+      document.getElementById('login-error').style.display = 'none';
+      // Clear report form fields
+      document.getElementById('issue-type').value = '';
+      document.getElementById('issue-desc').value = '';
+      goTo('page-login');
+    }
+  </script>
+</body>
+
+</html>
