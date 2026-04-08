@@ -1,0 +1,271 @@
+/* =============================================================
+   TenantDesk — Design System & Component Styles
+   =============================================================
+   Organized by: Tokens → Layout → Components → Pages → Utilities
+   ============================================================= */
+
+/* --- Design Tokens --- */
+:root {
+  --c-dark: #003049;
+  --c-red: #d62828;
+  --c-orange: #f77f00;
+  --c-yellow: #fcbf49;
+  --c-bg: #EAE2B7;
+  --c-white: #ffffff;
+  --c-gray-bg: #f4f6f8;
+  --c-text: #222222;
+  --c-muted: #888888;
+}
+
+/* --- Reset & Base --- */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+body { background: var(--c-bg); min-height: 100vh; display: flex; padding: 40px 20px; transition: background 0.3s; color: var(--c-text); }
+
+/* --- Animations --- */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* =============================================================
+   LAYOUT — Tenant View (mobile card)
+   ============================================================= */
+.app { width: 100%; max-width: 480px; background: var(--c-white); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,48,73,0.1); min-height: 600px; display: flex; flex-direction: column; margin: 0 auto; transition: all 0.4s ease; position: relative; }
+.nav { background: var(--c-dark); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
+.body { padding: 24px 20px; flex: 1; overflow-y: auto; max-height: 100vh; }
+.page { display: none; } .page.active { display: block; animation: fadeIn 0.4s ease forwards; }
+
+/* =============================================================
+   LAYOUT — Dashboard View (full-width with sidebar)
+   ============================================================= */
+body.layout-dashboard { padding: 0; background: var(--c-gray-bg); }
+body.layout-dashboard .app { max-width: 100%; border-radius: 0; min-height: 100vh; flex-direction: row; margin: 0; box-shadow: none; }
+body.layout-dashboard #top-nav { display: none; }
+body.layout-dashboard .body { padding: 40px 50px; background: var(--c-gray-bg); }
+
+/* =============================================================
+   COMPONENT — Sidebar
+   ============================================================= */
+.sidebar { display: none; flex-direction: column; width: 260px; background: var(--c-dark); padding: 30px 24px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.05); }
+body.layout-dashboard .sidebar { display: flex; }
+.sb-logo-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.sb-logo { font-size: 22px; font-weight: 700; color: var(--c-white); }
+.sb-role { font-size: 11px; color: var(--c-yellow); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; margin-bottom: 40px; padding-left: 36px; }
+.sb-menu { display: flex; flex-direction: column; gap: 8px; }
+.sb-item { background: transparent; border: none; color: rgba(255,255,255,0.6); text-align: left; padding: 14px 16px; border-radius: 100px; font-size: 14px; cursor: pointer; transition: all 250ms; font-weight: 500; display: flex; align-items: center; gap: 12px; }
+.sb-item:hover { background: rgba(255,255,255,0.12); color: var(--c-white); transform: scale(1.02); }
+.sb-item.active {
+  background-color: var(--c-yellow);
+  color: var(--c-dark);
+  box-shadow: rgba(252, 191, 73, .2) 0 -25px 18px -14px inset, rgba(252, 191, 73, .15) 0 1px 2px, rgba(252, 191, 73, .15) 0 2px 4px, rgba(252, 191, 73, .15) 0 4px 8px, rgba(252, 191, 73, .15) 0 8px 16px;
+}
+.sb-item.active:hover {
+  box-shadow: rgba(252, 191, 73, .35) 0 -25px 18px -14px inset, rgba(252, 191, 73, .25) 0 1px 2px, rgba(252, 191, 73, .25) 0 2px 4px, rgba(252, 191, 73, .25) 0 4px 8px, rgba(252, 191, 73, .25) 0 8px 16px;
+  transform: scale(1.02);
+}
+
+/* =============================================================
+   COMPONENT — Top Navigation
+   ============================================================= */
+.nav-title { color: var(--c-white); font-size: 18px; font-weight: 700; letter-spacing: -0.02em; }
+.nav-sub { color: rgba(255,255,255,0.7); font-size: 11px; margin-top: 2px; }
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--c-orange); display: flex; align-items: center; justify-content: center; color: var(--c-white); font-size: 12px; font-weight: 600; cursor: pointer; }
+.nav-admin-btn { background: rgba(255,255,255,0.1); border: none; color: var(--c-white); font-size: 11px; padding: 6px 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+.nav-admin-btn:hover { background: rgba(255,255,255,0.2); }
+
+/* =============================================================
+   COMPONENT — Typography & Sections
+   ============================================================= */
+h2 { font-size: 24px; font-weight: 700; color: var(--c-dark); margin-bottom: 6px; letter-spacing: -0.02em; }
+.sub { font-size: 14px; color: var(--c-muted); margin-bottom: 24px; }
+label { display: block; font-size: 13px; color: var(--c-dark); margin-bottom: 6px; margin-top: 16px; font-weight: 500; }
+hr { border: none; border-top: 1px solid #f0f0f0; margin: 16px 0; }
+
+/* =============================================================
+   COMPONENT — Form Controls
+   ============================================================= */
+select, textarea, input[type=text], input[type=password], input[type=email], input[type=number] { background: var(--c-white); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: var(--c-text); border: 1px solid rgba(0,0,0,0.1); width: 100%; font-family: inherit; transition: all 0.2s; }
+select:focus, textarea:focus, input:focus { outline: none; border-color: var(--c-orange); box-shadow: 0 0 0 3px rgba(247, 127, 0, 0.1); }
+textarea { resize: none; height: 84px; }
+.search-box { width: 100%; padding: 9px 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px; margin-bottom: 16px; font-family: inherit; }
+.search-box:focus { outline: none; border-color: #185FA5; }
+
+/* =============================================================
+   COMPONENT — Buttons
+   ============================================================= */
+.btn-primary {
+  background-color: var(--c-orange);
+  border-radius: 100px;
+  box-shadow: rgba(247, 127, 0, .2) 0 -25px 18px -14px inset,rgba(247, 127, 0, .15) 0 1px 2px,rgba(247, 127, 0, .15) 0 2px 4px,rgba(247, 127, 0, .15) 0 4px 8px,rgba(247, 127, 0, .15) 0 8px 16px,rgba(247, 127, 0, .15) 0 16px 32px;
+  color: var(--c-white); cursor: pointer; display: inline-block; font-family: inherit;
+  padding: 12px 20px; text-align: center; text-decoration: none; transition: all 250ms;
+  border: 0; font-size: 14px; font-weight: 600; width: 100%; margin-bottom: 10px;
+}
+.btn-primary:hover {
+  box-shadow: rgba(247, 127, 0, .35) 0 -25px 18px -14px inset,rgba(247, 127, 0, .25) 0 1px 2px,rgba(247, 127, 0, .25) 0 2px 4px,rgba(247, 127, 0, .25) 0 4px 8px,rgba(247, 127, 0, .25) 0 8px 16px,rgba(247, 127, 0, .25) 0 16px 32px;
+  transform: scale(1.02);
+}
+.btn-ghost { background: var(--c-white); color: var(--c-dark); border: 1px solid rgba(0,0,0,0.1); border-radius: 100px; padding: 12px 20px; font-size: 14px; font-weight: 600; width: 100%; cursor: pointer; margin-bottom: 10px; transition: all 250ms; }
+.btn-ghost:hover { background: var(--c-gray-bg); border-color: rgba(0,0,0,0.2); transform: scale(1.02); }
+.btn-sm.blue {
+  background-color: var(--c-dark); color: #fff; border-radius: 100px;
+  box-shadow: rgba(0, 48, 73, .2) 0 -15px 10px -10px inset, rgba(0, 48, 73, .15) 0 1px 2px, rgba(0, 48, 73, .15) 0 2px 4px;
+  padding: 6px 14px; border: none; font-size: 11px; transition: all 250ms; cursor: pointer;
+  display: inline-block; text-align: center;
+}
+.btn-sm.blue:hover { transform: scale(1.05) rotate(-1deg); }
+.btn-sm.reject {
+  background-color: var(--c-red); color: #fff; border-radius: 100px;
+  box-shadow: rgba(214, 40, 40, .2) 0 -15px 10px -10px inset, rgba(214, 40, 40, .15) 0 1px 2px, rgba(214, 40, 40, .15) 0 2px 4px;
+  padding: 6px 14px; border: none; font-size: 11px; transition: all 250ms; cursor: pointer;
+  display: inline-block; text-align: center;
+}
+.btn-sm.reject:hover { transform: scale(1.05) rotate(1deg); }
+.back-btn { background: none; border: none; color: #185FA5; font-size: 13px; cursor: pointer; padding: 0 0 16px; display: block; }
+
+/* =============================================================
+   COMPONENT — Info Cards
+   ============================================================= */
+.info-card { background: var(--c-white); border-radius: 12px; padding: 16px; margin-bottom: 18px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: transform 0.2s; }
+.info-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+.info-card-label { font-size: 10px; color: var(--c-muted); letter-spacing: 0.05em; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; text-transform: uppercase; }
+.info-row { display: flex; justify-content: space-between; font-size: 14px; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,0.04); align-items: center; gap: 8px; }
+.info-row:last-child { border-bottom: none; padding-bottom: 0; }
+.info-key { color: var(--c-muted); flex-shrink: 0; font-size: 13px; }
+.info-val { font-weight: 600; color: var(--c-dark); text-align: right; }
+
+/* =============================================================
+   COMPONENT — Stat Cards & Dashboard
+   ============================================================= */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: var(--c-white); border-radius: 14px; padding: 20px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; transition: all 300ms ease; }
+.stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,48,73,0.08); }
+.stat-num { font-size: 32px; font-weight: 800; color: var(--c-dark); letter-spacing: -0.02em; }
+.stat-label { font-size: 12px; color: var(--c-muted); margin-top: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.dash-card { background: var(--c-white); border-radius: 14px; padding: 24px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; transition: all 300ms ease; }
+.dash-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,48,73,0.08); }
+.dash-card-title { font-size: 11px; color: #aaa; margin-bottom: 10px; letter-spacing: 0.03em; font-weight: 600; text-transform: uppercase; }
+
+/* =============================================================
+   COMPONENT — Charts
+   ============================================================= */
+.chart-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px; justify-content: center; }
+.chart-legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--c-text); }
+.chart-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.chart-legend-val { font-weight: 700; margin-left: 2px; }
+
+/* =============================================================
+   COMPONENT — Ticket List
+   ============================================================= */
+.ticket-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid #f0f0f0; cursor:pointer; }
+.t-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.t-info { flex: 1; }
+.t-title { font-size: 13px; font-weight: 500; color: #222; }
+.t-sub { font-size: 11px; color: #aaa; margin-top: 2px; }
+.t-badge { font-size: 10px; padding: 3px 9px; border-radius: 20px; flex-shrink: 0; }
+.b-open { background: #FAEEDA; color: #633806; }
+.b-progress { background: #E6F1FB; color: #0C447C; }
+.b-resolved { background: #EAF3DE; color: #3B6D11; }
+
+/* =============================================================
+   COMPONENT — Urgency Indicators
+   ============================================================= */
+.urgency-critical { background: rgba(214,40,40,0.1); color: var(--c-red); border-left: 3px solid var(--c-red); }
+.urgency-high { background: rgba(247,127,0,0.1); color: var(--c-orange); border-left: 3px solid var(--c-orange); }
+.urgency-medium { background: rgba(252,191,73,0.15); color: #B38600; border-left: 3px solid var(--c-yellow); }
+.urgency-low { background: #f8f9fa; color: var(--c-muted); border-left: 3px solid #ccc; }
+.urgency-badge { font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 20px; flex-shrink: 0; letter-spacing: 0.03em; text-transform: uppercase; }
+.badge-critical { background: var(--c-red); color: var(--c-white); }
+.badge-high { background: var(--c-orange); color: var(--c-white); }
+.badge-medium { background: var(--c-yellow); color: var(--c-dark); }
+.badge-low { background: var(--c-gray-200); color: var(--c-dark); }
+.badge-sleek { display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 6px; background: rgba(0,48,73,0.05); color: var(--c-muted); text-transform: uppercase; border: 1px solid rgba(0,48,73,0.1); margin-left: 8px; letter-spacing: 0.05em; }
+.badge-sleek.verified { background: rgba(59,109,17,0.1); color: #3B6D11; border-color: rgba(59,109,17,0.2); }
+.override-tag { font-size: 9px; color: #aaa; margin-left: 6px; }
+
+/* =============================================================
+   COMPONENT — Admin Ticket Cards
+   ============================================================= */
+.admin-section { margin-bottom: 20px; }
+.admin-building-header { background: #185FA5; color: #E6F1FB; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.admin-ticket { background: #f8f8f8; border-radius: 8px; padding: 12px; margin-bottom: 8px; border: 1px solid #eee; }
+.admin-ticket-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.admin-ticket-id { font-size: 11px; color: #aaa; }
+.admin-ticket-type { font-size: 13px; font-weight: 600; color: #222; }
+.admin-ticket-detail { font-size: 12px; color: #666; margin-bottom: 4px; }
+.admin-status-select { font-size: 11px; padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; background: #fff; cursor: pointer; width: auto; }
+.admin-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+.admin-tab { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f5f5f5; font-size: 12px; cursor: pointer; text-align: center; color: #555; }
+.admin-tab.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+
+/* =============================================================
+   COMPONENT — Confirmation Page
+   ============================================================= */
+.confirm-center { text-align: center; padding: 8px 0; }
+.confirm-icon { width: 54px; height: 54px; border-radius: 50%; background: #EAF3DE; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.ticket-id { font-size: 22px; font-weight: 700; color: #185FA5; margin: 8px 0 10px; }
+.dept-pill { display: inline-block; font-size: 11px; padding: 4px 14px; border-radius: 20px; background: #E6F1FB; color: #185FA5; margin-bottom: 16px; }
+.confirm-note { font-size: 12px; color: #999; margin-bottom: 18px; }
+.error { font-size: 12px; color: #c0392b; margin-top: 8px; display: none; }
+.change-log { background: #FAEEDA; border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #633806; margin-bottom: 14px; }
+.no-tickets { font-size: 13px; color: #aaa; text-align: center; padding: 20px 0; }
+.edit-actions { display: none; gap: 10px; margin-top: 18px; }
+
+/* =============================================================
+   COMPONENT — File Upload & Previews
+   ============================================================= */
+.drop-zone { border: 2px dashed #ccc; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
+.drop-zone.dragover { border-color: #185FA5; background: #f0f6ff; }
+.drop-zone-text { font-size: 12px; color: #888; margin-top: 4px; }
+.preview-strip { display: flex; gap: 8px; margin-top: 10px; overflow-x: auto; padding-bottom: 4px; }
+.preview-thumb { position: relative; width: 60px; height: 60px; border-radius: 8px; overflow: hidden; border: 1px solid #eee; flex-shrink: 0; }
+.preview-thumb img, .preview-thumb video { width: 100%; height: 100%; object-fit: cover; }
+.preview-remove { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.5); color: #fff; border: none; border-radius: 50%; width: 16px; height: 16px; font-size: 9px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.attach-strip { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.attach-thumb { width: 44px; height: 44px; border-radius: 6px; overflow: hidden; cursor: pointer; border: 1px solid #ddd; }
+.attach-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.attach-count { font-size: 11px; color: #185FA5; }
+
+/* =============================================================
+   COMPONENT — Lightbox
+   ============================================================= */
+.lightbox { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: none; align-items: center; justify-content: center; }
+.lightbox.active { display: flex; }
+.lightbox img, .lightbox video { max-width: 90%; max-height: 90%; border-radius: 8px; }
+.lightbox-close { position: absolute; top: 16px; right: 20px; background: none; border: none; color: #fff; font-size: 28px; cursor: pointer; }
+
+/* =============================================================
+   COMPONENT — Loading Spinner
+   ============================================================= */
+.loading { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.7); z-index: 999; display: none; align-items: center; justify-content: center; }
+.loading.active { display: flex; }
+.spinner { width: 32px; height: 32px; border: 3px solid #eee; border-top-color: #185FA5; border-radius: 50%; animation: spin 0.6s linear infinite; }
+
+/* =============================================================
+   COMPONENT — Finance Table (Requisition Form)
+   ============================================================= */
+.finance-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13px; }
+.finance-table th, .finance-table td { border-bottom: 1px solid rgba(0,0,0,0.05); padding: 10px; text-align: left; }
+.finance-table th { font-weight: 600; color: var(--c-muted); font-size: 11px; text-transform: uppercase; }
+.finance-table .amount-col { text-align: right; width: 120px; }
+.finance-input { width: 100%; border: none; background: transparent; padding: 4px; outline: none; font-size: 13px; }
+.finance-input.amount { text-align: right; font-weight: 600; }
+.finance-total-row { font-weight: 700; background: rgba(247, 127, 0, 0.05); }
+
+/* =============================================================
+   COMPONENT — Building Heatmap
+   ============================================================= */
+.urgency-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.urgency-bar-label { font-size: 11px; width: 55px; flex-shrink: 0; color: #555; }
+.urgency-bar-track { flex: 1; background: #eee; border-radius: 20px; height: 8px; overflow: hidden; }
+.urgency-bar-fill { height: 8px; border-radius: 20px; transition: width 0.4s; }
+.urgency-bar-count { font-size: 11px; color: #888; width: 20px; text-align: right; }
+.building-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f0f0f0; }
+.building-row:last-child { border-bottom: none; }
+.building-name { font-size: 12px; color: #333; flex: 1; }
+.building-count { font-size: 11px; font-weight: 600; color: #185FA5; width: 24px; text-align: center; }
+.building-dots { display: flex; gap: 3px; }
+.building-dot { width: 8px; height: 8px; border-radius: 50%; }
+.suggestion-card { background: #f0f6ff; border-radius: 10px; padding: 14px; border: 1px solid #cce0ff; margin-bottom: 10px; }
+.suggestion-title { font-size: 13px; font-weight: 600; color: #185FA5; margin-bottom: 4px; }
+.suggestion-desc { font-size: 12px; color: #555; line-height: 1.6; }

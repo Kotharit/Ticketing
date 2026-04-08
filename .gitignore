@@ -31,3 +31,15 @@
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+.vscode/
+
+# Ignore Node.js artifacts (leftover from pre-Rails migration)
+node_modules/
+
+# Ignore Google service account credentials
+credentials.json
+
+# Ignore uploaded attachments
+/public/uploads/*
+!/public/uploads/.keep
+/uploads/*
