@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="TenantDesk — Tenant maintenance ticketing portal" />
-  <title>TenantDesk</title>
+  <meta name="description" content="Estate Department — Maintenance ticketing portal" />
+  <title>Estate Department — Ticketing Module</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,7 +18,7 @@
 
   <!-- ======================== SIDEBAR ======================== -->
   <div class="sidebar" id="app-sidebar">
-    <div class="sb-logo-wrap"><i data-feather="shield"></i><div class="sb-logo">TenantDesk</div></div>
+    <div class="sb-logo-wrap"><i data-feather="shield"></i><div class="sb-logo">Estate Dept.</div></div>
     <div class="sb-role" id="sb-role">Admin Portal</div>
     <div class="sb-menu" id="admin-sb-menu">
       <button class="sb-item active" id="sb-dash" onclick="switchAdminTab('dashboard')"><i data-feather="pie-chart" style="width:18px"></i> Dashboard Overview</button>
@@ -32,7 +32,7 @@
 
     <!-- ======================== TOP NAV ======================== -->
     <div class="nav" id="top-nav">
-      <div><div class="nav-title">TenantDesk</div><div class="nav-sub" id="nav-sub">Maintenance Portal</div></div>
+      <div><div class="nav-title">Estate Dept.</div><div class="nav-sub" id="nav-sub">Maintenance Portal</div></div>
       <div class="nav-right">
         <button class="nav-admin-btn" id="manager-nav-btn" onclick="goTo('page-manager-login')">Manager</button>
         <button class="nav-admin-btn" id="admin-nav-btn" onclick="goTo('page-admin-login')">Admin</button>
@@ -108,7 +108,7 @@
           <i data-feather="upload-cloud" style="color:var(--c-orange); width:32px; height:32px; margin-bottom:8px;"></i>
           <div class="drop-zone-text">Drag files here or <span style="color:#185FA5;text-decoration:underline">browse</span></div>
         </div>
-        <input type="file" id="file-input" multiple accept="image/*,video/*" style="display:none" onchange="handleFiles(this.files)" />
+        <input type="file" id="file-input" multiple accept="image/*,.pdf" style="display:none" onchange="handleFiles(this.files)" />
         <div class="preview-strip" id="preview-strip"></div>
         <button class="btn-primary" style="margin-top:16px" onclick="submitTicket()">Submit request</button>
       </div>
@@ -177,9 +177,12 @@
           <div class="stat-card" style="cursor:pointer" onclick="filterManagerTickets('Pending')"><div class="stat-num" style="color:var(--c-dark)" id="mgr-stat-pending">0</div><div class="stat-label">Pending Requisitions</div></div>
           <div class="stat-card" style="cursor:pointer" onclick="filterManagerTickets('Awaiting Admin')"><div class="stat-num" style="color:var(--c-orange)" id="mgr-stat-awaiting">0</div><div class="stat-label">Awaiting Admin</div></div>
           <div class="stat-card" style="cursor:pointer" onclick="filterManagerTickets('Approved')"><div class="stat-num" style="color:#3B6D11" id="mgr-stat-approved">0</div><div class="stat-label">Approved</div></div>
+          <div class="stat-card" style="cursor:pointer" onclick="filterManagerTickets('Rejected')"><div class="stat-num" style="color:var(--c-red)" id="mgr-stat-rejected">0</div><div class="stat-label">Rejected</div></div>
+          <div class="stat-card" style="cursor:pointer" onclick="filterManagerTickets('All')"><div class="stat-num" style="color:var(--c-muted)" id="mgr-stat-all">—</div><div class="stat-label">View All</div></div>
         </div>
-        <div class="dash-card">
-          <div class="dash-card-title" id="manager-directory-title">Pending Tickets Directory</div>
+        <div class="dash-card" style="min-height:400px">
+          <div class="dash-card-title" id="manager-directory-title">All Tickets Directory</div>
+          <input class="search-box" type="text" id="mgr-search" placeholder="Search by location, tenant, or issue type..." oninput="renderManagerTickets()" style="padding:14px; border-radius:10px; border-color:rgba(0,0,0,0.1); font-size:15px; margin-bottom:24px"/>
           <div id="manager-tickets-list"></div>
         </div>
       </div>
@@ -253,7 +256,6 @@
       <div class="page" id="page-admin">
         <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 24px;">
           <div><h2>Global Overview</h2><div class="sub" style="margin-bottom:0">Live organizational metrics</div></div>
-          <div style="font-size:32px; color:var(--c-dark); font-weight:700; text-align:right" id="admin-total-cost">₹0<div style="font-size:11px; color:var(--c-muted); text-transform:uppercase; font-weight:600; letter-spacing:0.05em; margin-top:2px">Total Vendor Costs</div></div>
         </div>
 
         <div class="admin-tabs" style="display:none">
@@ -263,12 +265,31 @@
 
         <div id="admin-tab-dashboard">
           <div class="stats-grid">
-            <div class="stat-card" style="cursor:pointer" onclick="switchAdminTab('tickets')"><div class="stat-num" style="color:var(--c-dark)" id="stat-total">0</div><div class="stat-label">Total Tickets</div></div>
-            <div class="stat-card" style="cursor:pointer" onclick="switchAdminTab('tickets')"><div class="stat-num" style="color:var(--c-red)" id="stat-open">0</div><div class="stat-label">Open</div></div>
-            <div class="stat-card" style="cursor:pointer" onclick="switchAdminTab('tickets')"><div class="stat-num" style="color:var(--c-orange)" id="stat-progress">0</div><div class="stat-label">In Progress</div></div>
-            <div class="stat-card" style="cursor:pointer" onclick="switchAdminTab('tickets')"><div class="stat-num" style="color:#3B6D11" id="stat-resolved">0</div><div class="stat-label">Resolved</div></div>
-            <div class="stat-card"><div class="stat-num" style="color:var(--c-dark)" id="stat-req-pending">0</div><div class="stat-label">Pending Requisitions</div></div>
-            <div class="stat-card"><div class="stat-num" style="color:#3B6D11" id="stat-req-approved">0</div><div class="stat-label">Approved Requisitions</div></div>
+            <div class="stat-card" style="cursor:pointer" onclick="adminFilterAndSwitch('all')"><div class="stat-num" style="color:var(--c-dark)" id="stat-total">0</div><div class="stat-label">Total Tickets</div></div>
+            <div class="stat-card" style="cursor:pointer" onclick="adminFilterAndSwitch('open')"><div class="stat-num" style="color:var(--c-red)" id="stat-open">0</div><div class="stat-label">Open</div></div>
+            <div class="stat-card" style="cursor:pointer" onclick="adminFilterAndSwitch('progress')"><div class="stat-num" style="color:var(--c-orange)" id="stat-progress">0</div><div class="stat-label">In Progress</div></div>
+            <div class="stat-card" style="cursor:pointer" onclick="adminFilterAndSwitch('resolved')"><div class="stat-num" style="color:#3B6D11" id="stat-resolved">0</div><div class="stat-label">Resolved</div></div>
+            <div class="stat-card" style="cursor:pointer" onclick="adminFilterAndSwitch('req-pending')"><div class="stat-num" style="color:var(--c-dark)" id="stat-req-pending">0</div><div class="stat-label">Pending Requisitions</div></div>
+            <div class="stat-card" style="cursor:pointer" onclick="adminFilterAndSwitch('req-approved')"><div class="stat-num" style="color:#3B6D11" id="stat-req-approved">0</div><div class="stat-label">Approved Requisitions</div></div>
+          </div>
+
+          <!-- Financial Overview -->
+          <div class="dash-card" style="margin-bottom:20px">
+            <div class="dash-card-title">FINANCIAL OVERVIEW</div>
+            <div class="stats-grid" style="margin-top:12px">
+              <div class="stat-card" style="background:linear-gradient(135deg,#003049,#185FA5);color:#fff;border:none">
+                <div class="stat-num" style="color:#fff;font-size:24px" id="fin-total-approved">₹0</div>
+                <div class="stat-label" style="color:rgba(255,255,255,0.7)">Total Approved Costs</div>
+              </div>
+              <div class="stat-card" style="background:linear-gradient(135deg,#3B6D11,#5a9e2a);color:#fff;border:none">
+                <div class="stat-num" style="color:#fff;font-size:24px" id="fin-month-approved">₹0</div>
+                <div class="stat-label" style="color:rgba(255,255,255,0.7)">Approved This Month</div>
+              </div>
+              <div class="stat-card" style="background:linear-gradient(135deg,#f77f00,#fcbf49);color:#fff;border:none">
+                <div class="stat-num" style="color:#fff;font-size:24px" id="fin-pending-cost">₹0</div>
+                <div class="stat-label" style="color:rgba(255,255,255,0.7)">Pending Approval</div>
+              </div>
+            </div>
           </div>
 
           <div class="charts-grid">
@@ -277,32 +298,47 @@
               <div style="position:relative;height:250px;width:100%"><canvas id="chart-issue-type"></canvas></div>
             </div>
             <div class="dash-card">
-              <div class="dash-card-title">STATUS DISTRIBUTION</div>
+              <div class="dash-card-title">TICKET STATUS TREND</div>
               <div style="position:relative;height:250px;width:100%"><canvas id="chart-status"></canvas></div>
             </div>
           </div>
 
           <div class="charts-grid">
             <div class="dash-card">
-              <div class="dash-card-title">URGENCY BREAKDOWN</div>
+              <div class="dash-card-title">ACTIVE URGENCY BREAKDOWN</div>
               <div style="position:relative;height:220px;width:100%; display:flex; justify-content:center"><canvas id="chart-urgency"></canvas></div>
               <div class="chart-legend" id="urgency-legend"></div>
             </div>
             <div class="dash-card">
-              <div class="dash-card-title">BUILDING HEATMAP</div>
+              <div class="dash-card-title">BUILDING ACTIVITY</div>
               <div id="building-heatmap"><p class="no-tickets">No tickets yet.</p></div>
             </div>
+          </div>
+
+          <div class="dash-card" style="margin-top:20px">
+            <div class="dash-card-title">QUERIES RESOLVED OVER TIME</div>
+            <div style="position:relative;height:220px;width:100%"><canvas id="chart-resolved"></canvas></div>
           </div>
         </div>
 
         <div id="admin-tab-tickets" style="display:none">
           <div class="dash-card" style="min-height: 500px;">
             <div class="dash-card-title">TICKET MANAGEMENT DIRECTORY</div>
+            <!-- Filter tabs -->
+            <div id="admin-filter-tabs" style="display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap">
+              <button class="admin-filter-btn active" data-filter="all" onclick="setAdminFilter('all')">All</button>
+              <button class="admin-filter-btn" data-filter="open" onclick="setAdminFilter('open')">Open</button>
+              <button class="admin-filter-btn" data-filter="progress" onclick="setAdminFilter('progress')">In Progress</button>
+              <button class="admin-filter-btn" data-filter="resolved" onclick="setAdminFilter('resolved')">Resolved</button>
+              <button class="admin-filter-btn" data-filter="req-pending" onclick="setAdminFilter('req-pending')">Req. Pending</button>
+              <button class="admin-filter-btn" data-filter="req-approved" onclick="setAdminFilter('req-approved')">Req. Approved</button>
+            </div>
             <input class="search-box" type="text" id="admin-search" placeholder="Search by area, tenant, or issue description..." oninput="renderAdminTickets()" style="padding:14px; border-radius:10px; border-color:rgba(0,0,0,0.1); font-size:15px; margin-bottom:24px"/>
             <div id="admin-tickets-list"></div>
           </div>
         </div>
       </div>
+
 
     </div>
   </div>
@@ -318,14 +354,14 @@
 <div class="loading" id="loading"><div class="spinner"></div></div>
 
 <!-- JavaScript modules (order matters: dependencies first) -->
-<script src="/js/api.js"></script>
-<script src="/js/app.js"></script>
-<script src="/js/navigation.js"></script>
-<script src="/js/auth.js"></script>
-<script src="/js/attachments.js"></script>
-<script src="/js/dashboard.js"></script>
-<script src="/js/tickets.js"></script>
-<script src="/js/admin.js"></script>
-<script src="/js/manager.js"></script>
+<script src="/js/api.js?v=2"></script>
+<script src="/js/app.js?v=2"></script>
+<script src="/js/navigation.js?v=2"></script>
+<script src="/js/auth.js?v=2"></script>
+<script src="/js/attachments.js?v=2"></script>
+<script src="/js/dashboard.js?v=2"></script>
+<script src="/js/tickets.js?v=2"></script>
+<script src="/js/admin.js?v=2"></script>
+<script src="/js/manager.js?v=2"></script>
 </body>
 </html>

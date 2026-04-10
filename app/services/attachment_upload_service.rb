@@ -8,9 +8,20 @@ require 'fileutils'
 class AttachmentUploadService
   MAX_FILE_SIZE = 10.megabytes
 
+  ALLOWED_MIME_TYPES = %w[
+    image/jpeg
+    image/png
+    image/gif
+    image/webp
+    application/pdf
+  ].freeze
+
+  ALLOWED_EXTENSIONS = %w[.jpg .jpeg .png .gif .webp .pdf].freeze
+
   # Attempts Drive upload first; falls back to local storage if Drive is
   # unavailable or the upload fails.
   def self.upload(file)
+    validate!(file)
     if GoogleService::DRIVE_FOLDER_ID.present?
       upload_to_drive(file)
     else
@@ -53,5 +64,15 @@ class AttachmentUploadService
     { 'id' => "loc_#{filename}", 'name' => file.original_filename }
   end
 
-  private_class_method :upload_to_drive, :save_locally
+  # Raises ArgumentError if the file's MIME type or extension is not on the
+  # allow-list, or if the file exceeds the size cap.
+  def self.validate!(file)
+    ext = File.extname(file.original_filename.to_s).downcase
+    unless ALLOWED_MIME_TYPES.include?(file.content_type) && ALLOWED_EXTENSIONS.include?(ext)
+      raise ArgumentError, "File type not permitted: #{file.content_type} (#{ext})"
+    end
+    raise ArgumentError, "File exceeds 10 MB limit" if file.size > MAX_FILE_SIZE
+  end
+
+  private_class_method :validate!, :upload_to_drive, :save_locally
 end

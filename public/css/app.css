@@ -1,5 +1,5 @@
 /* =============================================================
-   TenantDesk — Design System & Component Styles
+   Estate Department Ticketing Module — Design System & Component Styles
    =============================================================
    Organized by: Tokens → Layout → Components → Pages → Utilities
    ============================================================= */
@@ -19,7 +19,12 @@
 
 /* --- Reset & Base --- */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-body { background: var(--c-bg); min-height: 100vh; display: flex; padding: 40px 20px; transition: background 0.3s; color: var(--c-text); }
+body {
+  background-color: var(--c-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='none' stroke='%23003049' stroke-width='0.9' opacity='0.08'%3E%3Cpolygon points='60,18 66.9,43.4 89.7,30.3 76.6,53.1 102,60 76.6,66.9 89.7,89.7 66.9,76.6 60,102 53.1,76.6 30.3,89.7 43.4,66.9 18,60 43.4,53.1 30.3,30.3 53.1,43.4'/%3E%3Cpolygon points='66.9,43.4 76.6,53.1 76.6,66.9 66.9,76.6 53.1,76.6 43.4,66.9 43.4,53.1 53.1,43.4'/%3E%3Cline x1='60' y1='18' x2='60' y2='0'/%3E%3Cline x1='89.7' y1='30.3' x2='120' y2='0'/%3E%3Cline x1='102' y1='60' x2='120' y2='60'/%3E%3Cline x1='89.7' y1='89.7' x2='120' y2='120'/%3E%3Cline x1='60' y1='102' x2='60' y2='120'/%3E%3Cline x1='30.3' y1='89.7' x2='0' y2='120'/%3E%3Cline x1='18' y1='60' x2='0' y2='60'/%3E%3Cline x1='30.3' y1='30.3' x2='0' y2='0'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 120px;
+  min-height: 100vh; display: flex; padding: 40px 20px; transition: background-color 0.3s; color: var(--c-text);
+}
 
 /* --- Animations --- */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -36,10 +41,15 @@ body { background: var(--c-bg); min-height: 100vh; display: flex; padding: 40px 
 /* =============================================================
    LAYOUT — Dashboard View (full-width with sidebar)
    ============================================================= */
-body.layout-dashboard { padding: 0; background: var(--c-gray-bg); }
+body.layout-dashboard { padding: 0; background-color: var(--c-gray-bg); }
 body.layout-dashboard .app { max-width: 100%; border-radius: 0; min-height: 100vh; flex-direction: row; margin: 0; box-shadow: none; }
 body.layout-dashboard #top-nav { display: none; }
-body.layout-dashboard .body { padding: 40px 50px; background: var(--c-gray-bg); }
+body.layout-dashboard .body {
+  padding: 40px 50px;
+  background-color: var(--c-gray-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cg fill='none' stroke='%23003049' stroke-width='0.9' opacity='0.05'%3E%3Cpolygon points='60,18 66.9,43.4 89.7,30.3 76.6,53.1 102,60 76.6,66.9 89.7,89.7 66.9,76.6 60,102 53.1,76.6 30.3,89.7 43.4,66.9 18,60 43.4,53.1 30.3,30.3 53.1,43.4'/%3E%3Cpolygon points='66.9,43.4 76.6,53.1 76.6,66.9 66.9,76.6 53.1,76.6 43.4,66.9 43.4,53.1 53.1,43.4'/%3E%3Cline x1='60' y1='18' x2='60' y2='0'/%3E%3Cline x1='89.7' y1='30.3' x2='120' y2='0'/%3E%3Cline x1='102' y1='60' x2='120' y2='60'/%3E%3Cline x1='89.7' y1='89.7' x2='120' y2='120'/%3E%3Cline x1='60' y1='102' x2='60' y2='120'/%3E%3Cline x1='30.3' y1='89.7' x2='0' y2='120'/%3E%3Cline x1='18' y1='60' x2='0' y2='60'/%3E%3Cline x1='30.3' y1='30.3' x2='0' y2='0'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 120px;
+}
 
 /* =============================================================
    COMPONENT — Sidebar
@@ -120,6 +130,14 @@ textarea { resize: none; height: 84px; }
   display: inline-block; text-align: center;
 }
 .btn-sm.reject:hover { transform: scale(1.05) rotate(1deg); }
+.btn-sm.confirm {
+  background-color: #3B6D11; color: #fff; border-radius: 100px;
+  box-shadow: rgba(59,109,17,.2) 0 -15px 10px -10px inset, rgba(59,109,17,.15) 0 1px 2px, rgba(59,109,17,.15) 0 2px 4px;
+  padding: 6px 14px; border: none; font-size: 11px; transition: all 250ms; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 5px; text-align: center;
+}
+.btn-sm.confirm:hover { transform: scale(1.05) rotate(-1deg); }
+.btn-sm.confirm:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
 .back-btn { background: none; border: none; color: #185FA5; font-size: 13px; cursor: pointer; padding: 0 0 16px; display: block; }
 
 /* =============================================================
@@ -194,6 +212,41 @@ textarea { resize: none; height: 84px; }
 .admin-ticket-type { font-size: 13px; font-weight: 600; color: #222; }
 .admin-ticket-detail { font-size: 12px; color: #666; margin-bottom: 4px; }
 .admin-status-select { font-size: 11px; padding: 4px 8px; border-radius: 6px; border: 1px solid #ccc; background: #fff; cursor: pointer; width: auto; }
+
+/* --- Progress Stepper (read-only, admin) --- */
+.prog-stepper {
+  display: flex; align-items: flex-start; margin: 12px 0 10px; padding: 4px 0;
+}
+.prog-step {
+  display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; z-index: 1;
+}
+.prog-dot {
+  width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: #bbb; background: #fff; border: 2px solid #d9dde3;
+  transition: all 0.35s cubic-bezier(.4,0,.2,1); position: relative;
+}
+.prog-dot.prog-done {
+  background: #185FA5; border-color: #185FA5; color: #fff;
+}
+.prog-dot.prog-active {
+  background: #185FA5; border-color: #185FA5; color: #fff;
+  box-shadow: 0 0 0 4px rgba(24, 95, 165, 0.18);
+}
+.prog-label {
+  font-size: 9px; color: #c0c4cc; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  white-space: nowrap; transition: color 0.3s;
+}
+.prog-label-active { color: #185FA5; }
+.prog-label-done { color: #185FA5; }
+.prog-bar {
+  flex: 1; height: 3px; background: #e4e7ec; align-self: center; min-width: 20px;
+  border-radius: 2px; overflow: hidden; margin-top: 14px; /* vertically center with dot */
+}
+.prog-bar-fill {
+  width: 0%; height: 100%; background: #185FA5; border-radius: 2px;
+  transition: width 0.5s cubic-bezier(.4,0,.2,1);
+}
+.prog-bar-fill.prog-bar-done { width: 100%; }
 .admin-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
 .admin-tab { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; background: #f5f5f5; font-size: 12px; cursor: pointer; text-align: center; color: #555; }
 .admin-tab.active { background: #185FA5; color: #fff; border-color: #185FA5; }
@@ -260,12 +313,24 @@ textarea { resize: none; height: 84px; }
 .urgency-bar-track { flex: 1; background: #eee; border-radius: 20px; height: 8px; overflow: hidden; }
 .urgency-bar-fill { height: 8px; border-radius: 20px; transition: width 0.4s; }
 .urgency-bar-count { font-size: 11px; color: #888; width: 20px; text-align: right; }
-.building-row { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #f0f0f0; }
+.building-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
 .building-row:last-child { border-bottom: none; }
-.building-name { font-size: 12px; color: #333; flex: 1; }
-.building-count { font-size: 11px; font-weight: 600; color: #185FA5; width: 24px; text-align: center; }
-.building-dots { display: flex; gap: 3px; }
-.building-dot { width: 8px; height: 8px; border-radius: 50%; }
+.building-name { font-size: 13px; color: #333; font-weight: 500; width: 120px; flex-shrink: 0; }
+.building-count { font-size: 12px; font-weight: 700; color: #185FA5; width: 30px; text-align: right; flex-shrink: 0; }
+.building-bar-track { flex: 1; background: #f0f0f0; border-radius: 6px; height: 22px; overflow: hidden; display: flex; position: relative; }
+.building-bar-segment { height: 100%; transition: width 0.4s ease; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #fff; min-width: 0; }
 .suggestion-card { background: #f0f6ff; border-radius: 10px; padding: 14px; border: 1px solid #cce0ff; margin-bottom: 10px; }
 .suggestion-title { font-size: 13px; font-weight: 600; color: #185FA5; margin-bottom: 4px; }
 .suggestion-desc { font-size: 12px; color: #555; line-height: 1.6; }
+
+/* =============================================================
+   COMPONENT — Admin Filter Buttons
+   ============================================================= */
+.admin-filter-btn {
+  padding: 8px 16px; border-radius: 100px; border: 1px solid rgba(0,0,0,0.1);
+  background: var(--c-white); color: var(--c-muted); font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 200ms; font-family: inherit;
+}
+.admin-filter-btn:hover { border-color: #185FA5; color: #185FA5; transform: scale(1.02); }
+.admin-filter-btn.active { background: #185FA5; color: #fff; border-color: #185FA5; }
+

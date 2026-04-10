@@ -12,7 +12,7 @@ class AuthController < ApplicationController
 
     if tenant.nil?
       render json: { error: 'Email not found' }, status: :unauthorized
-    elsif tenant['password'] != password
+    elsif !password_matches?(tenant['password'], password)
       render json: { error: 'Wrong password' }, status: :unauthorized
     else
       # Strip password before sending to client
@@ -40,10 +40,22 @@ class AuthController < ApplicationController
 
     user = AuthService.public_send(finder_method, username)
 
-    if user.nil? || user[:password] != password
+    if user.nil? || !password_matches?(user[:password], password)
       render json: { error: "Invalid #{role_name} credentials" }, status: :unauthorized
     else
       render json: { success: true, role: role_name, name: user[:name] }
     end
+  end
+
+  # Compares a submitted password against a stored value using BCrypt.
+  # Falls back to plaintext comparison for accounts not yet migrated to
+  # hashed storage (logs a warning so those accounts can be identified
+  # and updated). Once all sheet passwords are replaced with BCrypt hashes
+  # the rescue branch can be removed.
+  def password_matches?(stored, submitted)
+    BCrypt::Password.new(stored.to_s) == submitted
+  rescue BCrypt::Errors::InvalidHash
+    Rails.logger.warn('Plaintext password comparison — migrate this account to a BCrypt hash in the sheet')
+    stored.to_s == submitted
   end
 end

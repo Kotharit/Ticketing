@@ -13,10 +13,14 @@ let selectedFiles = [];
 let reqSelectedFiles = [];
 let isAdmin = false;
 let isManager = false;
+let currentManagerName = '';
 let changeLog = [];
 let chartInstances = {};
 let currentRequisitionTicket = null;
-let currentManagerFilter = 'Pending';
+let currentManagerFilter = 'All';
+
+/* === Shared Constants === */
+const urgencyOrder = { critical: 0, high: 1, medium: 2, low: 3 };
 
 /* === DOM Helpers === */
 function esc(s) {

@@ -3,7 +3,14 @@
 # Attachment IDs are prefixed to indicate their storage backend:
 #   - "drv_<id>" → Google Drive file
 #   - "loc_<filename>" → local public/uploads/ file
+#
+# Images are served inline (required for the lightbox preview).
+# All other permitted types (PDFs) are forced to download via 'attachment'
+# disposition so the browser never renders them inline, preventing stored XSS
+# from any malicious HTML/SVG that slipped through earlier validation.
 class AttachmentsController < ApplicationController
+  IMAGE_MIME_TYPES = %w[image/jpeg image/png image/gif image/webp].freeze
+  IMAGE_EXTENSIONS = %w[.jpg .jpeg .png .gif .webp].freeze
   def show
     attachment_id = params[:id].to_s
 
@@ -27,7 +34,8 @@ class AttachmentsController < ApplicationController
     GoogleService.drive.get_file(drive_id, download_dest: buffer)
     buffer.rewind
 
-    send_data buffer.read, type: meta.mime_type, disposition: 'inline'
+    disposition = IMAGE_MIME_TYPES.include?(meta.mime_type) ? 'inline' : 'attachment'
+    send_data buffer.read, type: meta.mime_type, disposition: disposition
   rescue Google::Apis::Error => e
     Rails.logger.error("Drive attachment fetch failed [#{drive_id}]: #{e.message}")
     render json: { error: 'Attachment not found in Drive' }, status: :not_found
@@ -43,6 +51,8 @@ class AttachmentsController < ApplicationController
       return
     end
 
-    send_file file_path, disposition: 'inline'
+    ext = File.extname(filename).downcase
+    disposition = IMAGE_EXTENSIONS.include?(ext) ? 'inline' : 'attachment'
+    send_file file_path, disposition: disposition
   end
 end

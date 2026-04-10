@@ -2,12 +2,15 @@
  * File upload, preview rendering, drag-and-drop, and lightbox.
  */
 
+/* === Allowed file types (must match AttachmentUploadService::ALLOWED_MIME_TYPES) === */
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+
 /* === Ticket File Upload === */
 
 function handleFiles(fileList) {
   for (const f of fileList) {
-    if (!f.type.startsWith('image/') && !f.type.startsWith('video/')) {
-      alert(f.name + ': invalid type');
+    if (!ALLOWED_MIME_TYPES.includes(f.type)) {
+      alert(f.name + ': only images (JPEG, PNG, GIF, WebP) and PDFs are allowed');
       continue;
     }
     selectedFiles.push(f);
@@ -19,18 +22,13 @@ function renderPreviews() {
   const strip = document.getElementById('preview-strip');
 
   // Revoke old blob URLs to prevent memory leaks
-  strip.querySelectorAll('img, video').forEach(el => {
+  strip.querySelectorAll('img').forEach(el => {
     if (el.src.startsWith('blob:')) URL.revokeObjectURL(el.src);
   });
 
   strip.innerHTML = selectedFiles.map((f, i) => {
     const url = URL.createObjectURL(f);
-    const isVideo = f.type.startsWith('video/');
-    const media = isVideo
-      ? '<video src="' + url + '" muted></video>'
-      : '<img src="' + url + '" />';
-
-    return '<div class="preview-thumb">' + media +
+    return '<div class="preview-thumb"><img src="' + url + '" />' +
       '<button class="preview-remove" onclick="removeFile(' + i + ')">✕</button></div>';
   }).join('');
 }
@@ -44,6 +42,10 @@ function removeFile(index) {
 
 function handleReqFiles(fileList) {
   for (const f of fileList) {
+    if (!ALLOWED_MIME_TYPES.includes(f.type)) {
+      alert(f.name + ': only images (JPEG, PNG, GIF, WebP) and PDFs are allowed');
+      continue;
+    }
     reqSelectedFiles.push(f);
   }
   renderReqPreviews();
@@ -59,7 +61,10 @@ function renderReqPreviews() {
 
   strip.innerHTML = reqSelectedFiles.map((f, i) => {
     const url = URL.createObjectURL(f);
-    return '<div class="preview-thumb"><img src="' + url + '" />' +
+    const preview = f.type === 'application/pdf'
+      ? '<div style="font-size:10px;padding:6px 4px;text-align:center;word-break:break-all;color:#555">📄 ' + esc(f.name) + '</div>'
+      : '<img src="' + url + '" />';
+    return '<div class="preview-thumb">' + preview +
       '<button class="preview-remove" onclick="removeReqFile(' + i + ')">✕</button></div>';
   }).join('');
 

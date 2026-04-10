@@ -7,6 +7,7 @@ Rails.application.routes.draw do
     member do
       put :approve
       put :reject
+      put :confirm_vendor
     end
   end
 
@@ -18,5 +19,5 @@ Rails.application.routes.draw do
   put 'api/tickets/:id/status', to: 'tickets#update_status'
   put 'api/tickets/:id/urgency', to: 'tickets#update_urgency'
 
-  get 'api/attachments/:id', to: 'attachments#show', format: false
+  get 'api/attachments/:id', to: 'attachments#show', format: false, constraints: { id: /[^\/]+/ }
 end

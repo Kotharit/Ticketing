@@ -71,13 +71,14 @@ async function doManagerLogin() {
 
   try {
     showLoading();
-    await api('/api/manager/login', {
+    const result = await api('/api/manager/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
 
     isManager = true;
+    currentManagerName = result.name || 'Manager';
     document.getElementById('manager-error').style.display = 'none';
     document.getElementById('nav-sub').textContent = 'Manager View';
     document.getElementById('nav-avatar').style.display = 'none';
@@ -96,7 +97,7 @@ function restoreNavButtons() {
   document.getElementById('nav-avatar').style.display = 'none';
   document.getElementById('admin-nav-btn').style.display = '';
   document.getElementById('manager-nav-btn').style.display = '';
-  document.getElementById('nav-sub').textContent = 'Maintenance Portal';
+  document.getElementById('nav-sub').textContent = 'Ticketing Module';
 }
 
 function logout() {
@@ -104,6 +105,7 @@ function logout() {
   changeLog = [];
   isAdmin = false;
   isManager = false;
+  currentManagerName = '';
   allTickets = [];
   allRequisitions = [];
 
