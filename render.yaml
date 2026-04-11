@@ -6,7 +6,7 @@ services:
     runtime: ruby
     plan: free
     buildCommand: "./bin/render-build.sh"
-    startCommand: "bundle exec puma -C config/puma.rb"
+    startCommand: "bundle exec puma -C config/puma.rb -b tcp://0.0.0.0:$PORT"
     envVars:
       - key: RAILS_ENV
         value: production
