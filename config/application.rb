@@ -2,15 +2,9 @@ require_relative "boot"
 
 require "rails"
 
-# Only load the frameworks we actually use.
-# Excluded: ActionMailbox, ActionText (neither is used)
-require "active_record/railtie"
-require "active_storage/engine"
+# Only load what this app actually uses — no database, no mailer, no cable.
 require "action_controller/railtie"
 require "action_view/railtie"
-require "action_mailer/railtie"
-require "active_job/railtie"
-require "action_cable/engine"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
